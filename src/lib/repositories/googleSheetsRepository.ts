@@ -204,7 +204,7 @@ export class GoogleSheetsRepository {
       const sheetRowNumber = rowIndex + 2; // 1-based index + header row
       await sheets.spreadsheets.values.update({
         spreadsheetId: CONFIG.googleSheets.spreadsheetId,
-        range: `TASKS!A${sheetRowNumber}:N${sheetRowNumber}`,
+        range: `TASKS!A${sheetRowNumber}:O${sheetRowNumber}`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: [updatedRow],
