@@ -155,7 +155,7 @@ export const TaskAssignModal: React.FC<TaskAssignModalProps> = ({
           </div>
 
           {errorMsg && (
-            <div style={{ color: '#DC2626', fontSize: '0.85rem', marginBottom: '1rem' }}>
+            <div style={{ color: 'var(--status-blocked-text)', fontSize: '0.85rem', marginBottom: '1rem' }}>
               {errorMsg}
             </div>
           )}

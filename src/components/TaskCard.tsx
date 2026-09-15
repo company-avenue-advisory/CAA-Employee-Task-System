@@ -94,7 +94,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </div>
         )}
         {task.eodSubmitted && (
-          <div className="meta-item" style={{ color: '#059669', fontWeight: 600 }}>
+          <div className="meta-item" style={{ color: 'var(--status-completed-text)', fontWeight: 600 }}>
             <Lock size={13} />
             EOD Submitted
           </div>
@@ -163,7 +163,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       </div>
 
       {errorMsg && (
-        <div style={{ color: '#DC2626', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+        <div style={{ color: 'var(--status-blocked-text)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
           {errorMsg}
         </div>
       )}
@@ -181,7 +181,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           </button>
 
           {savedSuccess && (
-            <span style={{ color: '#059669', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
+            <span style={{ color: 'var(--status-completed-text)', fontSize: '0.85rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
               <CheckCircle size={15} />
               Update Saved!
             </span>

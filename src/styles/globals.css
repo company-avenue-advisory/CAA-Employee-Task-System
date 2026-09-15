@@ -1,52 +1,55 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  
-  /* Brand colors */
-  --caa-navy: #0F172A;
-  --caa-navy-light: #1E293B;
-  --caa-blue: #2563EB;
-  --caa-blue-hover: #1D4ED8;
-  --caa-blue-light: #EFF6FF;
-  
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Brand colors — caa-blue/caa-navy names kept for a minimal diff across components,
+     repointed to the warm/green accent direction. */
+  --caa-navy: #1F2320;
+  --caa-navy-light: #2B302B;
+  --caa-blue: #178A4C;
+  --caa-blue-hover: #106B3B;
+  --caa-blue-light: #E8F5ED;
+  --assigned: #4A5FBF;
+  --assigned-light: #ECEEFA;
+
   /* Neutral colors */
-  --bg-page: #F8FAFC;
+  --bg-page: #FAF8F4;
   --bg-card: #FFFFFF;
-  --border-color: #E2E8F0;
-  --border-hover: #CBD5E1;
-  --text-main: #0F172A;
-  --text-muted: #64748B;
-  --text-subtle: #94A3B8;
+  --border-color: #E7E4DA;
+  --border-hover: #D8D4C6;
+  --text-main: #1F2320;
+  --text-muted: #6B6F68;
+  --text-subtle: #9A9D96;
 
   /* Status Colors */
-  --status-not-started-bg: #F1F5F9;
-  --status-not-started-text: #475569;
-  --status-in-progress-bg: #FEF3C7;
-  --status-in-progress-text: #B45309;
-  --status-blocked-bg: #FEE2E2;
-  --status-blocked-text: #B91C1C;
-  --status-completed-bg: #D1FAE5;
-  --status-completed-text: #047857;
+  --status-not-started-bg: #EDECE5;
+  --status-not-started-text: #5B5E57;
+  --status-in-progress-bg: #FBF1DE;
+  --status-in-progress-text: #B4740E;
+  --status-blocked-bg: #FBEAEA;
+  --status-blocked-text: #C43D3D;
+  --status-completed-bg: #E8F5ED;
+  --status-completed-text: #178A4C;
 
   /* Priority Colors */
-  --priority-high-bg: #FEF2F2;
-  --priority-high-text: #DC2626;
-  --priority-high-border: #FCA5A5;
-  --priority-medium-bg: #FFFBEB;
-  --priority-medium-text: #D97706;
-  --priority-medium-border: #FCD34D;
-  --priority-low-bg: #F0F9FF;
-  --priority-low-text: #0284C7;
-  --priority-low-border: #BAE6FD;
+  --priority-high-bg: #FBEAEA;
+  --priority-high-text: #C43D3D;
+  --priority-high-border: #EFC1C1;
+  --priority-medium-bg: #FBF1DE;
+  --priority-medium-text: #B4740E;
+  --priority-medium-border: #F0DBA8;
+  --priority-low-bg: #ECEEFA;
+  --priority-low-text: #4A5FBF;
+  --priority-low-border: #C7CCEE;
 
   /* Elevation */
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.03);
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --shadow-sm: 0 1px 2px 0 rgba(31, 35, 32, 0.05);
+  --shadow-md: 0 4px 14px -2px rgba(31, 35, 32, 0.08);
+  --shadow-lg: 0 16px 40px -6px rgba(31, 35, 32, 0.14);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 }
 
 * {
@@ -88,13 +91,14 @@ a:hover {
 
 /* Navigation Header */
 .caa-header {
-  background-color: var(--caa-navy);
-  color: #FFFFFF;
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border-bottom: 1px solid var(--border-color);
   padding: 0.85rem 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 50;
@@ -107,8 +111,8 @@ a:hover {
 }
 
 .brand-logo {
-  background: var(--caa-blue);
-  color: #FFFFFF;
+  background: var(--caa-blue-light);
+  color: var(--caa-blue);
   font-weight: 800;
   font-size: 1.1rem;
   padding: 0.25rem 0.6rem;
@@ -201,8 +205,8 @@ a:hover {
 
 /* New badge types for task source */
 .badge-assigned {
-  background-color: var(--caa-blue-light);
-  color: var(--caa-blue);
+  background-color: var(--assigned-light);
+  color: var(--assigned);
 }
 .badge-self {
   background-color: var(--status-in-progress-bg);
@@ -462,11 +466,11 @@ a:hover {
 }
 
 .btn-success {
-  background-color: #059669;
+  background-color: var(--caa-blue);
   color: #FFFFFF;
 }
 .btn-success:hover {
-  background-color: #047857;
+  background-color: var(--caa-blue-hover);
 }
 
 .btn-secondary {
@@ -486,12 +490,13 @@ a:hover {
 
 /* EOD Footer Box */
 .eod-submit-card {
-  background: var(--caa-navy);
-  color: #FFFFFF;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
   margin-top: 2rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .eod-stats-grid {
@@ -502,7 +507,7 @@ a:hover {
 }
 
 .eod-stat-box {
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--bg-page);
   padding: 0.75rem;
   border-radius: var(--radius-sm);
   text-align: center;
@@ -511,11 +516,12 @@ a:hover {
 .eod-stat-num {
   font-size: 1.5rem;
   font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 .eod-stat-lbl {
   font-size: 0.7rem;
-  color: #94A3B8;
+  color: var(--text-muted);
   text-transform: uppercase;
   font-weight: 600;
 }

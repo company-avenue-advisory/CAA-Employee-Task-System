@@ -28,20 +28,20 @@ export const Header: React.FC<HeaderProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '0.65rem',
-              background: 'rgba(255, 255, 255, 0.1)',
+              background: 'var(--bg-page)',
               padding: '0.4rem 0.85rem',
               borderRadius: 'var(--radius-md)',
-              border: '1px solid rgba(255, 255, 255, 0.15)',
+              border: '1px solid var(--border-color)',
               fontSize: '0.85rem',
-              color: '#FFFFFF',
+              color: 'var(--text-main)',
             }}
           >
-            <UserCheck size={16} style={{ color: '#60A5FA' }} />
+            <UserCheck size={16} style={{ color: 'var(--caa-blue)' }} />
             <div>
               <strong style={{ display: 'block', fontSize: '0.85rem', lineHeight: 1.1 }}>
                 {currentEmployee.name} ({currentEmployee.role})
               </strong>
-              <span style={{ fontSize: '0.725rem', color: '#94A3B8' }}>
+              <span style={{ fontSize: '0.725rem', color: 'var(--text-muted)' }}>
                 {currentEmployee.email}
               </span>
             </div>
@@ -53,9 +53,6 @@ export const Header: React.FC<HeaderProps> = ({
             style={{
               padding: '0.4rem 0.75rem',
               fontSize: '0.8rem',
-              background: 'transparent',
-              color: '#FFFFFF',
-              borderColor: 'rgba(255, 255, 255, 0.2)',
             }}
             onClick={onLogout}
             title="Sign Out"

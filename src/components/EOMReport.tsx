@@ -8,15 +8,15 @@ interface EOMReportProps {
 }
 
 const STATUS_COLORS: Record<TaskStatus, string> = {
-  'Completed': '#059669',
-  'In Progress': '#D97706',
-  'Blocked': '#DC2626',
-  'Not Started': '#64748B',
+  'Completed': 'var(--status-completed-text)',
+  'In Progress': 'var(--status-in-progress-text)',
+  'Blocked': 'var(--status-blocked-text)',
+  'Not Started': 'var(--text-muted)',
 };
 
 const SOURCE_COLORS = {
-  ASSIGNED: '#2563EB',
-  SELF_ADDED: '#D97706',
+  ASSIGNED: 'var(--assigned)',
+  SELF_ADDED: 'var(--status-in-progress-text)',
 };
 
 // --- Deterministic, pure helpers (no AI, no side effects) ---
@@ -257,8 +257,8 @@ function StackedWeeklyBars({ weeks }: { weeks: { label: string; submitted: numbe
           return (
             <div key={w.label} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.35rem' }}>
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', height: 120, width: '100%' }}>
-                <div style={{ height: pendingHeight, background: '#FCD34D', width: '100%', borderRadius: pendingHeight > 0 ? '4px 4px 0 0' : 0 }} />
-                <div style={{ height: submittedHeight, background: '#059669', width: '100%', borderRadius: pendingHeight > 0 ? 0 : '4px 4px 0 0' }} />
+                <div style={{ height: pendingHeight, background: 'var(--priority-medium-border)', width: '100%', borderRadius: pendingHeight > 0 ? '4px 4px 0 0' : 0 }} />
+                <div style={{ height: submittedHeight, background: 'var(--status-completed-text)', width: '100%', borderRadius: pendingHeight > 0 ? 0 : '4px 4px 0 0' }} />
               </div>
               <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{w.label}</span>
             </div>
@@ -267,10 +267,10 @@ function StackedWeeklyBars({ weeks }: { weeks: { label: string; submitted: numbe
       </div>
       <div style={{ display: 'flex', gap: '1rem', marginTop: '0.75rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          <span style={{ width: 10, height: 10, background: '#059669', display: 'inline-block', borderRadius: 2 }} /> Submitted
+          <span style={{ width: 10, height: 10, background: 'var(--status-completed-text)', display: 'inline-block', borderRadius: 2 }} /> Submitted
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-          <span style={{ width: 10, height: 10, background: '#FCD34D', display: 'inline-block', borderRadius: 2 }} /> Pending
+          <span style={{ width: 10, height: 10, background: 'var(--priority-medium-border)', display: 'inline-block', borderRadius: 2 }} /> Pending
         </div>
       </div>
     </div>
@@ -427,7 +427,7 @@ export const EOMReport: React.FC<EOMReportProps> = ({ employees, tasks }) => {
         <KpiCard label="In Progress" value={inProgress} sub={`${pct(inProgress, total)}%`} color={STATUS_COLORS['In Progress']} />
         <KpiCard label="Blocked" value={blocked} sub={`${pct(blocked, total)}%`} color={STATUS_COLORS['Blocked']} />
         <KpiCard label="Not Started" value={notStarted} sub={`${pct(notStarted, total)}%`} color={STATUS_COLORS['Not Started']} />
-        <KpiCard label="EOD Submission" value={`${eodPct}%`} sub={`${eodSubmittedCount}/${total} tasks`} color="#059669" />
+        <KpiCard label="EOD Submission" value={`${eodPct}%`} sub={`${eodSubmittedCount}/${total} tasks`} color="var(--status-completed-text)" />
         <KpiCard label="Self‑Initiated" value={selfInitiatedCount} sub={`${pct(selfInitiatedCount, total)}%`} color={SOURCE_COLORS.SELF_ADDED} />
         <KpiCard label="Assigned" value={assignedCount} sub={`${pct(assignedCount, total)}%`} color={SOURCE_COLORS.ASSIGNED} />
       </div>
@@ -503,7 +503,7 @@ export const EOMReport: React.FC<EOMReportProps> = ({ employees, tasks }) => {
               ) : (
                 employeeStats.map((e, idx) => (
                   <tr key={e.employeeName}>
-                    <td>{idx === 0 ? <Award size={14} color="#D97706" /> : idx + 1}</td>
+                    <td>{idx === 0 ? <Award size={14} color="var(--status-in-progress-text)" /> : idx + 1}</td>
                     <td style={{ fontWeight: 600 }}>{e.employeeName}</td>
                     <td style={{ textAlign: 'center' }}>{e.total}</td>
                     <td style={{ textAlign: 'center', color: STATUS_COLORS['Completed'] }}>{e.completed}</td>
@@ -522,7 +522,7 @@ export const EOMReport: React.FC<EOMReportProps> = ({ employees, tasks }) => {
       {/* Blocked / pending work */}
       <div style={{ marginBottom: '1.5rem' }}>
         <div style={{ ...chartTitleStyle, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <AlertTriangle size={18} color="#DC2626" /> Blocked / Pending Work
+          <AlertTriangle size={18} color="var(--status-blocked-text)" /> Blocked / Pending Work
         </div>
         <div className="table-container">
           <table className="data-table">

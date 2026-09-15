@@ -28,10 +28,10 @@ export const EODSubmitFooter: React.FC<EODSubmitFooterProps> = ({
   return (
     <div className="eod-submit-card">
       <div style={{ marginBottom: '1rem' }}>
-        <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: '#FFFFFF' }}>
+        <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-main)' }}>
           End of Day Summary
         </h3>
-        <p style={{ fontSize: '0.85rem', color: '#94A3B8' }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
           Review today's task updates and submit your daily EOD status to your manager.
         </p>
       </div>
@@ -42,19 +42,19 @@ export const EODSubmitFooter: React.FC<EODSubmitFooterProps> = ({
           <div className="eod-stat-lbl">Total Tasks</div>
         </div>
         <div className="eod-stat-box">
-          <div className="eod-stat-num" style={{ color: '#34D399' }}>{completed}</div>
+          <div className="eod-stat-num" style={{ color: 'var(--status-completed-text)' }}>{completed}</div>
           <div className="eod-stat-lbl">Completed</div>
         </div>
         <div className="eod-stat-box">
-          <div className="eod-stat-num" style={{ color: '#FBBF24' }}>{inProgress}</div>
+          <div className="eod-stat-num" style={{ color: 'var(--status-in-progress-text)' }}>{inProgress}</div>
           <div className="eod-stat-lbl">In Progress</div>
         </div>
         <div className="eod-stat-box">
-          <div className="eod-stat-num" style={{ color: '#F87171' }}>{blocked}</div>
+          <div className="eod-stat-num" style={{ color: 'var(--status-blocked-text)' }}>{blocked}</div>
           <div className="eod-stat-lbl">Blocked</div>
         </div>
         <div className="eod-stat-box">
-          <div className="eod-stat-num" style={{ color: '#94A3B8' }}>{notStarted}</div>
+          <div className="eod-stat-num" style={{ color: 'var(--text-muted)' }}>{notStarted}</div>
           <div className="eod-stat-lbl">Not Started</div>
         </div>
       </div>
@@ -62,8 +62,8 @@ export const EODSubmitFooter: React.FC<EODSubmitFooterProps> = ({
       {errorMessage && (
         <div
           style={{
-            backgroundColor: '#7F1D1D',
-            color: '#FCA5A5',
+            backgroundColor: 'var(--status-blocked-bg)',
+            color: 'var(--status-blocked-text)',
             padding: '0.75rem 1rem',
             borderRadius: '6px',
             fontSize: '0.85rem',
@@ -81,9 +81,9 @@ export const EODSubmitFooter: React.FC<EODSubmitFooterProps> = ({
       {isAllSubmitted || submitSuccess ? (
         <div
           style={{
-            backgroundColor: '#064E3B',
-            color: '#A7F3D0',
-            border: '1px solid #059669',
+            backgroundColor: 'var(--status-completed-bg)',
+            color: 'var(--status-completed-text)',
+            border: '1px solid var(--status-completed-text)',
             padding: '0.85rem 1.25rem',
             borderRadius: '8px',
             display: 'flex',

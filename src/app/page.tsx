@@ -207,7 +207,7 @@ export default function Home() {
   if (error) {
     return (
       <div style={{ padding: '3rem', textAlign: 'center' }}>
-        <h2 style={{ color: '#DC2626', marginBottom: '1rem' }}>{error}</h2>
+        <h2 style={{ color: 'var(--status-blocked-text)', marginBottom: '1rem' }}>{error}</h2>
         <button type="button" className="btn btn-primary" onClick={() => fetchTasksAndEmployees(currentEmployee)}>
           Retry Loading
         </button>

@@ -164,28 +164,28 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Total Tasks</div>
         </div>
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#059669' }}>{completedCount}</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-completed-text)' }}>{completedCount}</div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Completed</div>
         </div>
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#D97706' }}>{inProgressCount}</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-in-progress-text)' }}>{inProgressCount}</div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>In Progress</div>
         </div>
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#DC2626' }}>{blockedCount}</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-blocked-text)' }}>{blockedCount}</div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Blocked</div>
         </div>
         <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: 'var(--radius-md)', padding: '1rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#64748B' }}>{notStartedCount}</div>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-muted)' }}>{notStartedCount}</div>
           <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Not Started</div>
         </div>
-        <div style={{ background: '#ECFDF5', border: '1px solid #A7F3D0', borderRadius: 'var(--radius-md)', padding: '1rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#047857' }}>{eodSubmittedCount}</div>
-          <div style={{ fontSize: '0.75rem', color: '#047857', fontWeight: 700, textTransform: 'uppercase' }}>EOD Submitted</div>
+        <div style={{ background: 'var(--status-completed-bg)', border: '1px solid #BFE3CC', borderRadius: 'var(--radius-md)', padding: '1rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-completed-text)' }}>{eodSubmittedCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--status-completed-text)', fontWeight: 700, textTransform: 'uppercase' }}>EOD Submitted</div>
         </div>
-        <div style={{ background: '#FFFBEB', border: '1px solid #FCD34D', borderRadius: 'var(--radius-md)', padding: '1rem', textAlign: 'center' }}>
-          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#B45309' }}>{eodPendingCount}</div>
-          <div style={{ fontSize: '0.75rem', color: '#B45309', fontWeight: 700, textTransform: 'uppercase' }}>EOD Pending</div>
+        <div style={{ background: 'var(--status-in-progress-bg)', border: '1px solid var(--priority-medium-border)', borderRadius: 'var(--radius-md)', padding: '1rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-in-progress-text)' }}>{eodPendingCount}</div>
+          <div style={{ fontSize: '0.75rem', color: 'var(--status-in-progress-text)', fontWeight: 700, textTransform: 'uppercase' }}>EOD Pending</div>
         </div>
       </div>
 
@@ -216,7 +216,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                   key={summary.employeeName}
                   style={{
                     backgroundColor:
-                      selectedEmployeeFilter === summary.employeeName ? '#EFF6FF' : undefined,
+                      selectedEmployeeFilter === summary.employeeName ? 'var(--caa-blue-light)' : undefined,
                     cursor: 'pointer',
                   }}
                   onClick={() => setSelectedEmployeeFilter(summary.employeeName)}
@@ -230,12 +230,12 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                     )}
                   </td>
                   <td style={{ textAlign: 'center', fontWeight: 600 }}>{summary.totalTasks}</td>
-                  <td style={{ textAlign: 'center', color: '#059669', fontWeight: 600 }}>{summary.completed}</td>
-                  <td style={{ textAlign: 'center', color: '#D97706', fontWeight: 600 }}>{summary.inProgress}</td>
-                  <td style={{ textAlign: 'center', color: '#DC2626', fontWeight: 600 }}>{summary.blocked}</td>
+                  <td style={{ textAlign: 'center', color: 'var(--status-completed-text)', fontWeight: 600 }}>{summary.completed}</td>
+                  <td style={{ textAlign: 'center', color: 'var(--status-in-progress-text)', fontWeight: 600 }}>{summary.inProgress}</td>
+                  <td style={{ textAlign: 'center', color: 'var(--status-blocked-text)', fontWeight: 600 }}>{summary.blocked}</td>
                   <td style={{ textAlign: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}>
-                      <div style={{ width: '60px', height: '6px', background: '#E2E8F0', borderRadius: '3px', overflow: 'hidden' }}>
+                      <div style={{ width: '60px', height: '6px', background: 'var(--border-color)', borderRadius: '3px', overflow: 'hidden' }}>
                         <div style={{ width: `${summary.overallProgress}%`, height: '100%', background: 'var(--caa-blue)' }} />
                       </div>
                       <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{summary.overallProgress}%</span>
@@ -245,11 +245,11 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                     {summary.totalTasks === 0 ? (
                       <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>No Tasks</span>
                     ) : summary.eodSubmitted ? (
-                      <span style={{ color: '#059669', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <span style={{ color: 'var(--status-completed-text)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
                         <CheckCircle2 size={16} /> ✓ Submitted
                       </span>
                     ) : (
-                      <span style={{ color: '#D97706', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
+                      <span style={{ color: 'var(--status-in-progress-text)', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.25rem' }}>
                         <AlertTriangle size={16} /> ⚠ Pending
                       </span>
                     )}
@@ -354,7 +354,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span className="task-id">{task.id}</span>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--caa-blue)', background: '#EFF6FF', padding: '0.1rem 0.5rem', borderRadius: '4px' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--caa-blue)', background: 'var(--caa-blue-light)', padding: '0.1rem 0.5rem', borderRadius: '4px' }}>
                       Assigned to: {task.employeeName}
                     </span>
                   </div>
@@ -377,7 +377,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                   </button>
                   <button
                     type="button"
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#DC2626', padding: '0.2rem' }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--status-blocked-text)', padding: '0.2rem' }}
                     onClick={() => onDeleteTask(task.id)}
                     title="Delete Task"
                   >

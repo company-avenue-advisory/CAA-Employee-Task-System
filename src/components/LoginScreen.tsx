@@ -91,15 +91,15 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({
               display: 'inline-flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'var(--caa-navy)',
-              color: '#FFFFFF',
+              background: 'var(--caa-blue-light)',
+              color: 'var(--caa-blue)',
               width: '56px',
               height: '56px',
-              borderRadius: '12px',
+              borderRadius: '13px',
               fontWeight: 800,
               fontSize: '1.25rem',
               marginBottom: '1rem',
-              boxShadow: 'var(--shadow-md)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             CAA

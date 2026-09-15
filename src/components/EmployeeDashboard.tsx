@@ -195,7 +195,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
                   <label>Due Time</label>
                   <input className="text-input" value={newDueTime} onChange={e => setNewDueTime(e.target.value)} required />
                 </div>
-                {errorMessage && <div style={{ color: '#DC2626' }}>{errorMessage}</div>}
+                {errorMessage && <div style={{ color: 'var(--status-blocked-text)' }}>{errorMessage}</div>}
                 <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
                   <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                     {isSubmitting ? 'Saving...' : 'Create Task'}

@@ -125,20 +125,20 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Total Employees</div>
           </div>
           <div style={cardStyle}>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#059669' }}>{activeEmployees}</div>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-completed-text)' }}>{activeEmployees}</div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Active Employees</div>
           </div>
           <div style={cardStyle}>
             <div style={{ fontSize: '1.75rem', fontWeight: 800 }}>{tasksToday}</div>
             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 600, textTransform: 'uppercase' }}>Tasks Today</div>
           </div>
-          <div style={{ ...cardStyle, background: '#ECFDF5', border: '1px solid #A7F3D0' }}>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#047857' }}>{eodSubmittedCount}</div>
-            <div style={{ fontSize: '0.75rem', color: '#047857', fontWeight: 700, textTransform: 'uppercase' }}>EOD Submitted</div>
+          <div style={{ ...cardStyle, background: 'var(--status-completed-bg)', border: '1px solid #BFE3CC' }}>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-completed-text)' }}>{eodSubmittedCount}</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--status-completed-text)', fontWeight: 700, textTransform: 'uppercase' }}>EOD Submitted</div>
           </div>
-          <div style={{ ...cardStyle, background: '#FFFBEB', border: '1px solid #FCD34D' }}>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: '#B45309' }}>{eodPendingCount}</div>
-            <div style={{ fontSize: '0.75rem', color: '#B45309', fontWeight: 700, textTransform: 'uppercase' }}>EOD Pending</div>
+          <div style={{ ...cardStyle, background: 'var(--status-in-progress-bg)', border: '1px solid var(--priority-medium-border)' }}>
+            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--status-in-progress-text)' }}>{eodPendingCount}</div>
+            <div style={{ fontSize: '0.75rem', color: 'var(--status-in-progress-text)', fontWeight: 700, textTransform: 'uppercase' }}>EOD Pending</div>
           </div>
         </div>
       </div>
@@ -225,7 +225,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <span className="task-id">{task.id}</span>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--caa-blue)', background: '#EFF6FF', padding: '0.1rem 0.5rem', borderRadius: '4px' }}>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--caa-blue)', background: 'var(--caa-blue-light)', padding: '0.1rem 0.5rem', borderRadius: '4px' }}>
                       {task.employeeName}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{task.date}</span>
@@ -249,7 +249,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                   )}
                   <button
                     type="button"
-                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#DC2626', padding: '0.2rem' }}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--status-blocked-text)', padding: '0.2rem' }}
                     onClick={() => onDeleteTask(task.id)}
                     title="Delete Task"
                   >
@@ -271,7 +271,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           System
         </h2>
         <div style={{ ...cardStyle, textAlign: 'left', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          <Database size={16} color={isDemoMode ? '#D97706' : 'var(--caa-blue)'} />
+          <Database size={16} color={isDemoMode ? 'var(--status-in-progress-text)' : 'var(--caa-blue)'} />
           <span style={{ fontWeight: 600 }}>{isDemoMode ? 'DEMO MODE • Simulated data layer' : 'LIVE • Google Sheets'}</span>
         </div>
       </div>
