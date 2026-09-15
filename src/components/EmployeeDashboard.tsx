@@ -124,90 +124,89 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
             </p>
           </div>
         ) : (
-          <>
-            {employeeTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onUpdate={onUpdateTask}
-              />
-            ))}
-            {/* Add Work Button */}
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-              <button className="btn btn-primary" onClick={() => setShowSelfAdd(true)}>
-                + Add Work I Took Up
-              </button>
-            </div>
+          employeeTasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onUpdate={onUpdateTask}
+            />
+          ))
+        )}
 
-            {/* Self Add Task Modal */}
-            {showSelfAdd && (
-              <div className="modal-overlay" onClick={() => setShowSelfAdd(false)}>
-                <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="selfAddTitle" onClick={e => e.stopPropagation()}>
-                  <button className="modal-close-button" aria-label="Close" onClick={() => setShowSelfAdd(false)}>&times;</button>
-                  <h2 id="selfAddTitle">Self‑Add Task</h2>
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-                      setIsSubmitting(true);
-                      setErrorMessage(null);
-                      try {
-                        const response = await fetch('/api/tasks', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            employeeName: currentEmployee.name,
-                            task: newTaskTitle,
-                            description: newDescription,
-                            priority: newPriority,
-                            dueTime: newDueTime,
-                            date: new Date().toISOString().split('T')[0],
-                          }),
-                        });
-                        if (!response.ok) throw new Error('Failed to create task');
-                        setShowSelfAdd(false);
-                        // Refresh task list after successful creation
-                        await onRefreshTasks();
-                      } catch (err: any) {
-                        setErrorMessage(err.message);
-                      } finally {
-                        setIsSubmitting(false);
-                      }
-                    }}
-                  >
-                    <div className="form-group">
-                      <label>Task Title</label>
-                      <input className="text-input" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} required />
-                    </div>
-                    <div className="form-group">
-                      <label>Description</label>
-                      <textarea className="textarea-input" value={newDescription} onChange={e => setNewDescription(e.target.value)} />
-                    </div>
-                    <div className="form-group">
-                      <label>Priority</label>
-                      <select className="select-input" value={newPriority} onChange={e => setNewPriority(e.target.value as TaskPriority)} required>
-                        <option value="High">High</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Low">Low</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label>Due Time</label>
-                      <input className="text-input" value={newDueTime} onChange={e => setNewDueTime(e.target.value)} required />
-                    </div>
-                    {errorMessage && <div style={{ color: '#DC2626' }}>{errorMessage}</div>}
-                    <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
-                      <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-                        {isSubmitting ? 'Saving...' : 'Create Task'}
-                      </button>
-                      <button type="button" className="btn btn-secondary" onClick={() => setShowSelfAdd(false)} disabled={isSubmitting}>
-                        Cancel
-                      </button>
-                    </div>
-                  </form>
+        {/* Add Work Button — always visible for Employee, regardless of task count */}
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+          <button className="btn btn-primary" onClick={() => setShowSelfAdd(true)}>
+            + Add Work I Took Up
+          </button>
+        </div>
+
+        {/* Self Add Task Modal */}
+        {showSelfAdd && (
+          <div className="modal-overlay" onClick={() => setShowSelfAdd(false)}>
+            <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="selfAddTitle" onClick={e => e.stopPropagation()}>
+              <button className="modal-close-button" aria-label="Close" onClick={() => setShowSelfAdd(false)}>&times;</button>
+              <h2 id="selfAddTitle">Self‑Add Task</h2>
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setIsSubmitting(true);
+                  setErrorMessage(null);
+                  try {
+                    const response = await fetch('/api/tasks', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        employeeName: currentEmployee.name,
+                        task: newTaskTitle,
+                        description: newDescription,
+                        priority: newPriority,
+                        dueTime: newDueTime,
+                        date: new Date().toISOString().split('T')[0],
+                      }),
+                    });
+                    if (!response.ok) throw new Error('Failed to create task');
+                    setShowSelfAdd(false);
+                    // Refresh task list after successful creation
+                    await onRefreshTasks();
+                  } catch (err: any) {
+                    setErrorMessage(err.message);
+                  } finally {
+                    setIsSubmitting(false);
+                  }
+                }}
+              >
+                <div className="form-group">
+                  <label>Task Title</label>
+                  <input className="text-input" value={newTaskTitle} onChange={e => setNewTaskTitle(e.target.value)} required />
                 </div>
-              </div>
-            )}
-          </>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea className="textarea-input" value={newDescription} onChange={e => setNewDescription(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label>Priority</label>
+                  <select className="select-input" value={newPriority} onChange={e => setNewPriority(e.target.value as TaskPriority)} required>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Due Time</label>
+                  <input className="text-input" value={newDueTime} onChange={e => setNewDueTime(e.target.value)} required />
+                </div>
+                {errorMessage && <div style={{ color: '#DC2626' }}>{errorMessage}</div>}
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+                  <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
+                    {isSubmitting ? 'Saving...' : 'Create Task'}
+                  </button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setShowSelfAdd(false)} disabled={isSubmitting}>
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
         )}
       </div>
 
