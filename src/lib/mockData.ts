@@ -1,0 +1,128 @@
+import { Employee, Task, TaskSource } from './types';
+
+export const INITIAL_EMPLOYEES: Employee[] = [
+  { id: 'CAA01', name: 'Anshika Singh', email: 'anshika@caa.com', role: 'Manager', active: true },
+  { id: 'CAA02', name: 'Ashwani Boora', email: 'ashwani@caa.com', role: 'Employee', active: true },
+  { id: 'CAA08', name: 'Yug', email: 'yug@caa.com', role: 'Employee', active: true },
+  { id: 'CAA09', name: 'Kishan Sharma', email: 'kishan@caa.com', role: 'Employee', active: true },
+  { id: 'CAA010', name: 'Ravdeep Singh', email: 'ravdeep@caa.com', role: 'Employee', active: true },
+  { id: 'CAA_IN0010', name: 'Khushi', email: 'khushi@caa.com', role: 'Employee', active: true },
+  { id: 'CAA_IN005', name: 'Wasim Khan', email: 'wasim@caa.com', role: 'Employee', active: true },
+  { id: 'CAA_IN009', name: 'Sunit', email: 'sunit@caa.com', role: 'Employee', active: true },
+];
+
+export function getTodayDateString(): string {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+const todayStr = getTodayDateString();
+
+export const INITIAL_TASKS: Task[] = [
+  {
+    id: 'TASK-0001',
+    date: todayStr,
+    employeeName: 'Rahul',
+    task: 'Research 20 fleet companies in North Region',
+    description: 'Compile contact info, fleet size, and decision-maker emails into the prospect sheet.',
+    priority: 'High',
+    dueTime: '5:00 PM',
+    status: 'In Progress',
+    progress: 60,
+    eodNote: 'Identified 12 companies so far with full lead details.',
+    outputLink: 'https://docs.google.com/spreadsheets/d/demo-fleet-prospects',
+    eodSubmitted: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    source: TaskSource.ASSIGNED,
+  },
+  {
+    id: 'TASK-0002',
+    date: todayStr,
+    employeeName: 'Rahul',
+    task: 'Follow up with 5 enterprise client leads',
+    description: 'Send revised commercial proposals to client leads from yesterday’s pipeline call.',
+    priority: 'Medium',
+    dueTime: '3:00 PM',
+    status: 'Completed',
+    progress: 100,
+    eodNote: 'All 5 emails sent with updated quotes attached.',
+    outputLink: '',
+    eodSubmitted: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    source: TaskSource.ASSIGNED,
+  },
+  {
+    id: 'TASK-0003',
+    date: todayStr,
+    employeeName: 'Ankit',
+    task: 'Audit Q3 vendor service contracts',
+    description: 'Review SLA clauses and pricing terms across active CAA maintenance vendors.',
+    priority: 'High',
+    dueTime: '4:00 PM',
+    status: 'Completed',
+    progress: 100,
+    eodNote: 'Completed audit for 8 vendors. Flagged 2 contracts for renegotiation.',
+    outputLink: 'https://docs.google.com/document/d/demo-vendor-audit',
+    eodSubmitted: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    source: TaskSource.ASSIGNED,
+  },
+  {
+    id: 'TASK-0004',
+    date: todayStr,
+    employeeName: 'Ankit',
+    task: 'Prepare weekly operations compliance report',
+    description: 'Consolidate vehicle safety checklist compliance numbers for management review.',
+    priority: 'Medium',
+    dueTime: '6:00 PM',
+    status: 'Completed',
+    progress: 100,
+    eodNote: 'Report compiled and uploaded to shared directory.',
+    outputLink: '',
+    eodSubmitted: true,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    source: TaskSource.ASSIGNED,
+  },
+  {
+    id: 'TASK-0005',
+    date: todayStr,
+    employeeName: 'Priya',
+    task: 'Competitor pricing analysis matrix',
+    description: 'Gather pricing tiers for top 3 competitors in regional fleet maintenance.',
+    priority: 'High',
+    dueTime: '5:30 PM',
+    status: 'Blocked',
+    progress: 35,
+    eodNote: 'Awaiting pricing confirmation from 2 competitors. Portal access restricted.',
+    outputLink: '',
+    eodSubmitted: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    source: TaskSource.ASSIGNED,
+  },
+  {
+    id: 'TASK-0006',
+    date: todayStr,
+    employeeName: 'Priya',
+    task: 'Update team inventory tracking database',
+    description: 'Log newly dispatched diagnostic tools to field technician profiles.',
+    priority: 'Low',
+    dueTime: '6:30 PM',
+    status: 'In Progress',
+    progress: 50,
+    eodNote: 'Updated 15 out of 30 technician profiles.',
+    outputLink: '',
+    eodSubmitted: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    source: TaskSource.ASSIGNED,
+  },
+];
+
