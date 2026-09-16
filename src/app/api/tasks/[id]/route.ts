@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDataProvider } from '@/lib/repositories/dataProvider';
 import { TaskStatus, TaskPriority } from '@/lib/types';
-import { getAuthenticatedUser, hasManagerAccess, resolveManagedNames } from '@/lib/auth';
+import { getAuthenticatedUser, hasManagerAccess, resolveManagedNames, resolveCurrentRole } from '@/lib/auth';
 
 const VALID_STATUSES: TaskStatus[] = ['Not Started', 'In Progress', 'Blocked', 'Completed'];
 const VALID_PRIORITIES: TaskPriority[] = ['High', 'Medium', 'Low'];
@@ -52,7 +52,9 @@ export async function PUT(
     }
 
     const provider = getDataProvider();
-    
+    const employees = await provider.getEmployees();
+    const currentRole = resolveCurrentRole(employees, session);
+
     // Fetch existing task to check ownership and EOD lock state
     const existingTasks = await provider.getTasks();
     const existingTask = existingTasks.find((t) => t.id === id);
@@ -65,7 +67,7 @@ export async function PUT(
     }
 
     // SERVER-SIDE AUTHORIZATION & EOD LOCK RULES:
-    if (session.role === 'Employee') {
+    if (currentRole === 'Employee') {
       // Rule 1: Employee can only update their own task
       if (existingTask.employeeName.toLowerCase() !== session.name.toLowerCase()) {
         return NextResponse.json(
@@ -84,10 +86,9 @@ export async function PUT(
           { status: 400 }
         );
       }
-    } else if (session.role === 'Senior Accountant') {
+    } else if (currentRole === 'Senior Accountant') {
       const isSelf = existingTask.employeeName.toLowerCase() === session.name.toLowerCase();
       if (!isSelf) {
-        const employees = await provider.getEmployees();
         const managed = resolveManagedNames(employees, session.email);
         if (!managed.has(existingTask.employeeName.toLowerCase())) {
           return NextResponse.json(
@@ -132,17 +133,19 @@ export async function DELETE(
 
     const { id } = params;
     const provider = getDataProvider();
+    const employees = await provider.getEmployees();
+    const currentRole = resolveCurrentRole(employees, session);
 
     // Authorization rule: Managers/Owner can delete any task; Senior Accountant only
     // tasks belonging to the employees they manage.
-    if (!hasManagerAccess(session.role)) {
-      if (session.role !== 'Senior Accountant') {
+    if (!hasManagerAccess(currentRole)) {
+      if (currentRole !== 'Senior Accountant') {
         return NextResponse.json(
           { success: false, error: 'Forbidden: Only Managers can delete tasks' },
           { status: 403 }
         );
       }
-      const [tasks, employees] = await Promise.all([provider.getTasks(), provider.getEmployees()]);
+      const tasks = await provider.getTasks();
       const target = tasks.find((t) => t.id === id);
       const managed = resolveManagedNames(employees, session.email);
       if (!target || !managed.has(target.employeeName.toLowerCase())) {

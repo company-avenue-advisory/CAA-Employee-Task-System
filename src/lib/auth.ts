@@ -44,6 +44,16 @@ export function resolveManagedNames(employees: Employee[], sessionEmail: string)
   return new Set((self?.manages || []).map((n) => n.toLowerCase()));
 }
 
+// The session cookie's `role` is only as fresh as the user's last login — up to 24h stale.
+// Every route that makes an authorization decision must re-derive the CURRENT role from
+// the live sheet instead of trusting the cookie, or a role change silently has no effect
+// until the token happens to expire. Falls back to the cookie's role only if the employee
+// record can't be found (e.g. a transient lookup issue), never on a real mismatch.
+export function resolveCurrentRole(employees: Employee[], session: UserSession): Role {
+  const self = employees.find((e) => e.email.toLowerCase() === session.email.toLowerCase());
+  return self ? self.role : session.role;
+}
+
 export function createSessionToken(employee: Employee): string {
   const header = { alg: 'HS256', typ: 'JWT' };
   const payload: UserSession = {

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDataProvider } from '@/lib/repositories/dataProvider';
 import { CreateTaskInput, TaskPriority, TaskStatus, TaskSource } from '@/lib/types';
 import { notificationService } from '@/services/notificationService';
-import { getAuthenticatedUser, resolveManagedNames } from '@/lib/auth';
+import { getAuthenticatedUser, resolveManagedNames, resolveCurrentRole } from '@/lib/auth';
 
 const VALID_PRIORITIES: TaskPriority[] = ['High', 'Medium', 'Low'];
 
@@ -22,17 +22,19 @@ export async function GET(request: NextRequest) {
     const status = (searchParams.get('status') as TaskStatus) || undefined;
     const priority = (searchParams.get('priority') as TaskPriority) || undefined;
 
+    const provider = getDataProvider();
+    const employees = await provider.getEmployees();
+    const currentRole = resolveCurrentRole(employees, session);
+
     // Strict Server-Side Employee Isolation
-    if (session.role === 'Employee') {
+    if (currentRole === 'Employee') {
       employeeName = session.name;
     }
 
-    const provider = getDataProvider();
     let tasks = await provider.getTasks({ date, employeeName, status, priority });
 
     // Senior Accountant sees only their own tasks plus their delegated reports' tasks.
-    if (session.role === 'Senior Accountant') {
-      const employees = await provider.getEmployees();
+    if (currentRole === 'Senior Accountant') {
       const managed = resolveManagedNames(employees, session.email);
       tasks = tasks.filter(
         (t) => t.employeeName.toLowerCase() === session.name.toLowerCase() || managed.has(t.employeeName.toLowerCase())
@@ -63,11 +65,14 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { employeeName, task, description, priority, dueTime, date } = body;
 
-    if (session.role === 'Manager' || session.role === 'Owner') {
+    const provider = getDataProvider();
+    const employees = await provider.getEmployees();
+    const currentRole = resolveCurrentRole(employees, session);
+
+    if (currentRole === 'Manager' || currentRole === 'Owner') {
       // Managers and Owner may assign tasks to any employee; source will be ASSIGNED server‑side.
-    } else if (session.role === 'Senior Accountant') {
+    } else if (currentRole === 'Senior Accountant') {
       // Senior Accountant may only assign tasks to their delegated reports.
-      const employees = await getDataProvider().getEmployees();
       const managed = resolveManagedNames(employees, session.email);
       if (!employeeName || !managed.has(employeeName.trim().toLowerCase())) {
         return NextResponse.json(
@@ -75,7 +80,7 @@ export async function POST(request: NextRequest) {
           { status: 403 }
         );
       }
-    } else if (session.role === 'Employee') {
+    } else if (currentRole === 'Employee') {
       // Employees can only create tasks for themselves.
       if (employeeName && employeeName.trim().toLowerCase() !== session.name.toLowerCase()) {
         return NextResponse.json(
@@ -116,10 +121,9 @@ export async function POST(request: NextRequest) {
       date,
       // Set source based on role: only a plain Employee self-adds; every other
       // role that reaches this point has already passed an assignment-authority check above.
-      source: session.role === 'Employee' ? TaskSource.SELF_ADDED : TaskSource.ASSIGNED,
+      source: currentRole === 'Employee' ? TaskSource.SELF_ADDED : TaskSource.ASSIGNED,
     };
 
-    const provider = getDataProvider();
     const newTask = await provider.createTask(input);
 
     // Trigger notification stub

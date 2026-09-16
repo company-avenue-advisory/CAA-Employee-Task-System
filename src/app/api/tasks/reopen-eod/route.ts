@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDataProvider } from '@/lib/repositories/dataProvider';
-import { getAuthenticatedUser, hasManagerAccess, resolveManagedNames } from '@/lib/auth';
+import { getAuthenticatedUser, hasManagerAccess, resolveManagedNames, resolveCurrentRole } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -23,17 +23,18 @@ export async function POST(request: NextRequest) {
     }
 
     const provider = getDataProvider();
+    const employees = await provider.getEmployees();
+    const currentRole = resolveCurrentRole(employees, session);
 
     // Authorization: Managers/Owner can reopen anyone's EOD; Senior Accountant
     // only for the employees they manage.
-    if (!hasManagerAccess(session.role)) {
-      if (session.role !== 'Senior Accountant') {
+    if (!hasManagerAccess(currentRole)) {
+      if (currentRole !== 'Senior Accountant') {
         return NextResponse.json(
           { success: false, error: 'Forbidden: Only Managers can reopen an EOD submission' },
           { status: 403 }
         );
       }
-      const employees = await provider.getEmployees();
       const managed = resolveManagedNames(employees, session.email);
       if (!managed.has(employeeName.trim().toLowerCase())) {
         return NextResponse.json(
