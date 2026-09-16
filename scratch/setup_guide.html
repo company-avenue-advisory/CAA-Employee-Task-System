@@ -1,0 +1,648 @@
+<title>CAA Task System Setup</title>
+<style>
+  :root {
+    --bg: #F7F8FA;
+    --surface: #FFFFFF;
+    --surface-2: #F3F4F6;
+    --surface-hover: #F9FAFB;
+    --border: #E5E7EB;
+    --border-strong: #D6D9DE;
+    --text: #0F1420;
+    --text-muted: #5B6472;
+    --text-subtle: #9297A1;
+    --accent: #B0791A;
+    --accent-strong: #8E6110;
+    --accent-tint: #FBF1DC;
+    --navy: #0B1E3D;
+    --navy-2: #173C6B;
+    --success: #0E9F6E;
+    --success-tint: #EAFBF3;
+    --warning: #B45309;
+    --warning-tint: #FEF6E7;
+    --warning-border: #F3DFAE;
+    --owner: #9A3B12;
+    --owner-tint: #FDECDC;
+    --on-accent: #FFFFFF;
+    --shadow-sm: 0 1px 2px rgba(15,20,32,0.05);
+    --shadow-md: 0 6px 16px rgba(15,20,32,0.08);
+    --shadow-lg: 0 16px 40px rgba(15,20,32,0.14);
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0A0D14;
+      --surface: #12161F;
+      --surface-2: #191E29;
+      --surface-hover: #1D2330;
+      --border: #262C3A;
+      --border-strong: #333A4A;
+      --text: #EEF0F4;
+      --text-muted: #9AA2B1;
+      --text-subtle: #6B7280;
+      --accent: #E4B356;
+      --accent-strong: #F2C878;
+      --accent-tint: #2C2408;
+      --navy: #060E1C;
+      --navy-2: #0F2A4D;
+      --success: #34D399;
+      --success-tint: #0E2A22;
+      --warning: #F5B15C;
+      --warning-tint: #2A2107;
+      --warning-border: #4A3C13;
+      --owner: #F0955C;
+      --owner-tint: #2E1B0D;
+      --on-accent: #1A1206;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+      --shadow-md: 0 6px 16px rgba(0,0,0,0.35);
+      --shadow-lg: 0 20px 48px rgba(0,0,0,0.5);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0A0D14;
+    --surface: #12161F;
+    --surface-2: #191E29;
+    --surface-hover: #1D2330;
+    --border: #262C3A;
+    --border-strong: #333A4A;
+    --text: #EEF0F4;
+    --text-muted: #9AA2B1;
+    --text-subtle: #6B7280;
+    --accent: #E4B356;
+    --accent-strong: #F2C878;
+    --accent-tint: #2C2408;
+    --navy: #060E1C;
+    --navy-2: #0F2A4D;
+    --success: #34D399;
+    --success-tint: #0E2A22;
+    --warning: #F5B15C;
+    --warning-tint: #2A2107;
+    --warning-border: #4A3C13;
+    --owner: #F0955C;
+    --owner-tint: #2E1B0D;
+    --on-accent: #1A1206;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.4);
+    --shadow-md: 0 6px 16px rgba(0,0,0,0.35);
+    --shadow-lg: 0 20px 48px rgba(0,0,0,0.5);
+    color-scheme: dark;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    line-height: 1.55;
+  }
+  html { scroll-behavior: smooth; }
+
+  .shell {
+    display: flex;
+    min-height: 100vh;
+    align-items: flex-start;
+  }
+
+  /* ---- Sidebar: fixed dark rail, deliberately theme-invariant like a workspace rail ---- */
+  .rail {
+    flex: 0 0 232px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    background: #0B1020;
+    color: #C7CCDA;
+    padding: 1.35rem 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6rem;
+    overflow-y: auto;
+  }
+  .rail-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0 0.4rem;
+  }
+  .rail-mark {
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: #0B1E3D;
+    border: 1px solid rgba(201,150,30,0.5);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.68rem; color: #E4B356; letter-spacing: 0.02em;
+    flex-shrink: 0;
+  }
+  .rail-brand-text { line-height: 1.2; }
+  .rail-brand-text .name { font-size: 0.86rem; font-weight: 700; color: #F4F5F8; }
+  .rail-brand-text .sub { font-size: 0.68rem; color: #7C839A; }
+
+  .rail-group { display: flex; flex-direction: column; gap: 0.1rem; }
+  .rail-label {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #5C6379;
+    padding: 0 0.6rem;
+    margin-bottom: 0.35rem;
+  }
+  .rail-link {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.42rem 0.6rem;
+    border-radius: 7px;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: #AEB4C4;
+    text-decoration: none;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .rail-link:hover { background: rgba(255,255,255,0.06); color: #F4F5F8; }
+  .rail-link.active { background: rgba(201,150,30,0.16); color: #E9CC8B; }
+  .rail-dot {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: currentColor; opacity: 0.55; flex-shrink: 0;
+  }
+  .rail-link.active .rail-dot { background: #C9962E; opacity: 1; }
+
+  .rail-cta {
+    margin-top: auto;
+    background: rgba(201,150,30,0.1);
+    border: 1px solid rgba(201,150,30,0.28);
+    border-radius: 10px;
+    padding: 0.8rem 0.85rem;
+  }
+  .rail-cta p { font-size: 0.72rem; color: #AEB4C4; margin: 0 0 0.55rem; line-height: 1.45; }
+  .rail-cta a {
+    display: block; text-align: center;
+    background: #C0951F; color: #0B1020;
+    font-size: 0.78rem; font-weight: 700;
+    padding: 0.45rem; border-radius: 6px; text-decoration: none;
+  }
+  .rail-cta a:hover { background: #D6A930; }
+
+  /* ---- Main ---- */
+  .main { flex: 1; min-width: 0; }
+  .topbar {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 2rem;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+  }
+  .crumb { font-size: 0.82rem; color: var(--text-muted); }
+  .crumb strong { color: var(--text); font-weight: 600; }
+  .topbar-cta {
+    font-size: 0.8rem; font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 0.3rem;
+  }
+  .topbar-cta:hover { color: var(--accent-strong); }
+
+  .content { max-width: 680px; margin: 0 auto; padding: 2.75rem 2rem 5rem; }
+
+  .eyebrow {
+    font-size: 0.76rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 0.5rem;
+  }
+  h1 {
+    font-size: clamp(1.65rem, 3.4vw, 2.15rem);
+    font-weight: 800; letter-spacing: -0.015em;
+    margin: 0 0 0.6rem; text-wrap: balance;
+  }
+  .sub { color: var(--text-muted); font-size: 1rem; max-width: 58ch; margin: 0 0 2.75rem; }
+  .sub a { color: var(--accent); font-weight: 500; }
+
+  section { scroll-margin-top: 5rem; margin-bottom: 2.5rem; }
+  section:last-of-type { margin-bottom: 0; }
+
+  h2.section-title {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-size: 1.02rem; font-weight: 700; margin: 0 0 1rem;
+  }
+  .section-num {
+    width: 1.5rem; height: 1.5rem; border-radius: 6px;
+    background: var(--accent-tint); color: var(--accent);
+    font-size: 0.75rem; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+    padding: 1.35rem 1.5rem;
+    transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+  }
+  .card p { margin: 0; color: var(--text-muted); font-size: 0.92rem; max-width: 56ch; }
+  .card p + p { margin-top: 0.55rem; }
+  .card code {
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px;
+    padding: 0.1rem 0.4rem; font-family: 'SF Mono', ui-monospace, monospace; font-size: 0.85em;
+  }
+
+  .link-btn {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    margin-top: 0.85rem; font-size: 0.87rem; font-weight: 600;
+    color: var(--accent); text-decoration: none;
+  }
+  .link-btn:hover { color: var(--accent-strong); }
+
+  /* ---- Browser-chrome preview of the real login screen ---- */
+  .browser-frame {
+    margin-top: 1.1rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .chrome-bar {
+    display: flex; align-items: center; gap: 10px;
+    padding: 0.6rem 0.85rem;
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--border);
+  }
+  .chrome-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+  .chrome-url {
+    flex: 1;
+    display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 0.28rem 0.9rem;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+  .chrome-body {
+    background: var(--surface-2);
+    padding: 2.25rem 1rem;
+    display: flex; justify-content: center;
+  }
+  .mini-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow-md);
+    padding: 1.6rem 1.6rem 1.3rem;
+    width: 100%; max-width: 250px; text-align: center;
+  }
+  .mini-logo {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: #0B1E3D; border: 1px solid rgba(201,150,30,0.55); color: #E4B356;
+    font-weight: 800; font-size: 0.78rem; letter-spacing: 0.03em;
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 0.85rem;
+  }
+  .mini-card h3 { font-size: 0.96rem; font-weight: 800; margin: 0 0 0.3rem; }
+  .mini-card p { font-size: 0.76rem; color: var(--text-muted); margin: 0 0 0.9rem; }
+  .mini-google-btn {
+    border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.48rem 0.85rem; font-size: 0.78rem; font-weight: 600; color: var(--text);
+    display: inline-flex; align-items: center; gap: 0.4rem; background: var(--surface);
+  }
+  .g-mark { width: 14px; height: 14px; flex-shrink: 0; }
+  .mini-foot {
+    margin-top: 0.8rem; padding-top: 0.65rem;
+    border-top: 1px solid var(--border);
+    font-size: 0.66rem; color: var(--text-subtle);
+  }
+
+  .callout {
+    display: flex; gap: 0.65rem;
+    background: var(--warning-tint);
+    border: 1px solid var(--warning-border);
+    border-radius: var(--radius-sm);
+    padding: 0.8rem 0.95rem;
+    margin-top: 1rem;
+    font-size: 0.84rem;
+    color: var(--warning);
+  }
+  .callout strong { color: var(--warning); }
+
+  .role-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 0.7rem;
+  }
+  .role-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-sm); padding: 0.8rem 0.9rem;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .role-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .role-pill {
+    display: inline-flex; align-items: center; gap: 0.35rem;
+    font-size: 0.72rem; font-weight: 700; letter-spacing: 0.02em;
+    padding: 0.15rem 0.55rem; border-radius: 999px;
+    margin-bottom: 0.45rem;
+  }
+  .role-pill.employee { background: var(--accent-tint); color: var(--accent); }
+  .role-pill.manager { background: var(--success-tint); color: var(--success); }
+  .role-pill.owner { background: var(--owner-tint); color: var(--owner); }
+  .role-card .role-desc { font-size: 0.79rem; color: var(--text-muted); line-height: 1.45; }
+
+  .checklist { display: flex; flex-direction: column; gap: 0.65rem; }
+  .check-row {
+    display: flex; align-items: flex-start; gap: 0.7rem;
+    font-size: 0.9rem; color: var(--text-muted);
+  }
+  .check-icon {
+    width: 1.15rem; height: 1.15rem; border-radius: 5px;
+    border: 1.5px solid var(--border-strong);
+    flex-shrink: 0; margin-top: 0.15rem;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--success);
+  }
+  .check-row strong { color: var(--text); font-weight: 600; }
+
+  /* ---- Share section styled like a Slack message ---- */
+  .slack-panel {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-md); box-shadow: var(--shadow-sm);
+    overflow: hidden;
+  }
+  .slack-panel-head {
+    display: flex; align-items: center; gap: 0.5rem;
+    padding: 0.85rem 1.25rem; border-bottom: 1px solid var(--border);
+    font-size: 0.82rem; color: var(--text-muted);
+  }
+  .slack-panel-head strong { color: var(--text); }
+  .slack-msg {
+    display: flex; gap: 0.85rem;
+    padding: 1.15rem 1.25rem;
+    transition: background 0.12s ease;
+  }
+  .slack-avatar {
+    width: 38px; height: 38px; border-radius: 9px; flex-shrink: 0;
+    background: #0B1E3D; border: 1px solid rgba(201,150,30,0.5);
+    color: #E4B356; font-weight: 800; font-size: 0.72rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .slack-msg-body { min-width: 0; flex: 1; }
+  .slack-msg-meta { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.3rem; }
+  .slack-msg-meta .sender { font-weight: 700; font-size: 0.88rem; color: var(--text); }
+  .slack-msg-meta .time { font-size: 0.74rem; color: var(--text-subtle); }
+  .slack-msg-text {
+    font-size: 0.88rem; line-height: 1.65; color: var(--text);
+    white-space: pre-wrap;
+  }
+  .slack-msg-text a { color: var(--accent); }
+  .slack-actions {
+    padding: 0.75rem 1.25rem 1.1rem;
+    display: flex; align-items: center; gap: 0.75rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+  .copy-btn {
+    background: var(--accent); color: var(--on-accent); border: none;
+    border-radius: 7px; padding: 0.5rem 1rem;
+    font-size: 0.83rem; font-weight: 600; font-family: var(--font-sans);
+    cursor: pointer; display: inline-flex; align-items: center; gap: 0.4rem;
+    transition: background 0.12s ease;
+  }
+  .copy-btn:hover { background: var(--accent-strong); }
+  .copy-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .copy-status { font-size: 0.8rem; color: var(--success); font-weight: 600; }
+
+  @media (max-width: 860px) {
+    .shell { flex-direction: column; }
+    .rail {
+      position: sticky; top: 0; height: auto; width: 100%;
+      flex-direction: row; align-items: center; gap: 0.75rem;
+      padding: 0.75rem 1rem; overflow-x: auto; overflow-y: visible;
+      z-index: 10;
+    }
+    .rail-brand { flex-shrink: 0; }
+    .rail-group { flex-direction: row; gap: 0.3rem; }
+    .rail-label { display: none; }
+    .rail-link { white-space: nowrap; }
+    .rail-cta { display: none; }
+    .content { padding: 2rem 1.1rem 4rem; }
+    .topbar { padding: 0.75rem 1.1rem; }
+  }
+</style>
+
+<div class="shell">
+  <nav class="rail" id="rail">
+    <div class="rail-brand">
+      <div class="rail-mark">CAA</div>
+      <div class="rail-brand-text">
+        <div class="name">Task &amp; EOD System</div>
+        <div class="sub">Setup guide</div>
+      </div>
+    </div>
+
+    <div class="rail-group">
+      <div class="rail-label">Setup</div>
+      <a class="rail-link" data-target="step-1" href="#step-1"><span class="rail-dot"></span>Get added</a>
+      <a class="rail-link" data-target="step-2" href="#step-2"><span class="rail-dot"></span>Sign in</a>
+      <a class="rail-link" data-target="step-3" href="#step-3"><span class="rail-dot"></span>Your dashboard</a>
+      <a class="rail-link" data-target="step-4" href="#step-4"><span class="rail-dot"></span>Bookmark it</a>
+    </div>
+
+    <div class="rail-group">
+      <div class="rail-label">Using it</div>
+      <a class="rail-link" data-target="rhythm" href="#rhythm"><span class="rail-dot"></span>Daily rhythm</a>
+    </div>
+
+    <div class="rail-group">
+      <div class="rail-label">Share</div>
+      <a class="rail-link" data-target="share" href="#share"><span class="rail-dot"></span>Message for the team</a>
+    </div>
+
+    <div class="rail-cta">
+      <p>Already added to the roster?</p>
+      <a href="https://caa-employee-task-system.vercel.app" target="_blank" rel="noopener">Open the app</a>
+    </div>
+  </nav>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="crumb">Getting started &nbsp;/&nbsp; <strong>CAA Task &amp; EOD System</strong></div>
+      <a class="topbar-cta" href="https://caa-employee-task-system.vercel.app" target="_blank" rel="noopener">Open app &rarr;</a>
+    </div>
+
+    <div class="content">
+      <p class="eyebrow">Company Avenue Advisory</p>
+      <h1>Getting started with the Task &amp; EOD System</h1>
+      <p class="sub">
+        Four steps, no installs, no new password &mdash; it runs at
+        <a href="https://caa-employee-task-system.vercel.app" target="_blank" rel="noopener">caa-employee-task-system.vercel.app</a>
+        and signs you in with the CAA Google account you already have.
+      </p>
+
+      <section id="step-1">
+        <h2 class="section-title"><span class="section-num">1</span>Get added to the roster</h2>
+        <div class="card">
+          <p>Send your manager the CAA Google account email you'll sign in with. They add you to the <code>EMPLOYEES</code> sheet with the right role &mdash; Employee, Manager, or Owner.</p>
+          <p>This is the only setup step, and someone else does it for you.</p>
+        </div>
+      </section>
+
+      <section id="step-2">
+        <h2 class="section-title"><span class="section-num">2</span>Open the app and sign in with Google</h2>
+        <div class="card">
+          <p>No separate account, no password &mdash; pick your CAA Google account when prompted.</p>
+          <a class="link-btn" href="https://caa-employee-task-system.vercel.app" target="_blank" rel="noopener">caa-employee-task-system.vercel.app &rarr;</a>
+
+          <div class="browser-frame">
+            <div class="chrome-bar">
+              <span class="chrome-dot" style="background:#FF5F57"></span>
+              <span class="chrome-dot" style="background:#FEBC2E"></span>
+              <span class="chrome-dot" style="background:#28C840"></span>
+              <span class="chrome-url">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="4" y="10" width="16" height="10" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
+                caa-employee-task-system.vercel.app
+              </span>
+            </div>
+            <div class="chrome-body">
+              <div class="mini-card">
+                <div class="mini-logo">CAA</div>
+                <h3>Daily Task &amp; EOD System</h3>
+                <p>Sign in with your CAA Google account</p>
+                <div class="mini-google-btn">
+                  <svg class="g-mark" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.61z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.95v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.95A9 9 0 0 0 0 9c0 1.45.35 2.83.95 4.03l3-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .95 4.97l3 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+                  Sign in with Google
+                </div>
+                <div class="mini-foot">Authorized Access Only.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="callout">
+            <span>&#9888;</span>
+            <span><strong>"Your Google account is not authorized"</strong> just means step 1 hasn't happened yet. Ping your manager and try again once you're added.</span>
+          </div>
+        </div>
+      </section>
+
+      <section id="step-3">
+        <h2 class="section-title"><span class="section-num">3</span>Land on the dashboard for your role</h2>
+        <div class="card">
+          <p style="margin-bottom: 1rem;">The app shows a different view depending on what's set in the roster &mdash; nothing to configure on your end.</p>
+          <div class="role-grid">
+            <div class="role-card">
+              <span class="role-pill employee">Employee</span>
+              <div class="role-desc">Today's assigned tasks, plus <strong style="color:var(--text)">+ Add Work I Took Up</strong> for anything you picked up yourself.</div>
+            </div>
+            <div class="role-card">
+              <span class="role-pill manager">Manager</span>
+              <div class="role-desc">Team dashboard: assign tasks, filter by employee/status/source, EOD roster.</div>
+            </div>
+            <div class="role-card">
+              <span class="role-pill owner">Owner</span>
+              <div class="role-desc">Everything a Manager sees, plus an Admin tab with company-wide reporting.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="step-4">
+        <h2 class="section-title"><span class="section-num">4</span>Bookmark it</h2>
+        <div class="card">
+          <p>It's a normal web app &mdash; save <code>caa-employee-task-system.vercel.app</code> to your home screen or bookmarks bar. Signing in again later is one click; the session keeps you signed in for 24 hours.</p>
+        </div>
+      </section>
+
+      <section id="rhythm">
+        <h2 class="section-title">Your daily rhythm as an Employee</h2>
+        <div class="card">
+          <div class="checklist">
+            <div class="check-row">
+              <span class="check-icon">&#10003;</span>
+              <span>Update <strong>status</strong> and <strong>progress</strong> on each task as you work through it.</span>
+            </div>
+            <div class="check-row">
+              <span class="check-icon">&#10003;</span>
+              <span>Add a short <strong>EOD note</strong> on the task &mdash; what happened, what's done, what's pending.</span>
+            </div>
+            <div class="check-row">
+              <span class="check-icon">&#10003;</span>
+              <span>Picked up work nobody assigned you? Log it with <strong>+ Add Work I Took Up</strong> so it shows up for your manager too.</span>
+            </div>
+            <div class="check-row">
+              <span class="check-icon">&#10003;</span>
+              <span>Before you sign off, hit <strong>Submit Today's EOD</strong>. It locks the day's tasks &mdash; ask your manager to reopen it if you need to fix something after.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="share">
+        <h2 class="section-title">Message for the team</h2>
+        <div class="slack-panel">
+          <div class="slack-panel-head">Paste this into <strong>#general</strong> (or wherever your team lives)</div>
+          <div class="slack-msg">
+            <div class="slack-avatar">CAA</div>
+            <div class="slack-msg-body">
+              <div class="slack-msg-meta"><span class="sender">You</span><span class="time">Today</span></div>
+              <div class="slack-msg-text" id="shareMsg">Hey team &mdash; the CAA Task &amp; EOD System is live: https://caa-employee-task-system.vercel.app
+
+No install, no new password &mdash; just open the link and "Sign in with Google" using your CAA account.
+
+If you see "account not authorized," it means you haven't been added yet &mdash; ping your manager with the Google email you want to sign in with, then try again.
+
+Once you're in: update your task status/progress as you go, add an EOD note, and hit "Submit Today's EOD" before you wrap up. Got work nobody assigned you? Log it with "+ Add Work I Took Up" so it's visible too.
+
+Questions &rarr; drop them here.</div>
+            </div>
+          </div>
+          <div class="slack-actions">
+            <button class="copy-btn" id="copyBtn" type="button">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M4 16V5a1 1 0 0 1 1-1h11"/></svg>
+              Copy message
+            </button>
+            <span class="copy-status" id="copyStatus" hidden>Copied to clipboard</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+  var btn = document.getElementById('copyBtn');
+  var status = document.getElementById('copyStatus');
+  var msg = document.getElementById('shareMsg').innerText;
+  btn.addEventListener('click', function () {
+    function shown() {
+      status.hidden = false;
+      setTimeout(function () { status.hidden = true; }, 2200);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(msg).then(shown, shown);
+    } else {
+      shown();
+    }
+  });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('.rail-link'));
+  var sections = links.map(function (l) { return document.getElementById(l.dataset.target); }).filter(Boolean);
+  if ('IntersectionObserver' in window && sections.length) {
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        var link = links.find(function (l) { return l.dataset.target === entry.target.id; });
+        if (!link) return;
+        if (entry.isIntersecting) {
+          links.forEach(function (l) { l.classList.remove('active'); });
+          link.classList.add('active');
+        }
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    sections.forEach(function (s) { observer.observe(s); });
+  }
+</script>

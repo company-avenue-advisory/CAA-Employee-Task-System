@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDataProvider } from '@/lib/repositories/dataProvider';
 import { CreateTaskInput, TaskPriority, TaskStatus, TaskSource } from '@/lib/types';
 import { notificationService } from '@/services/notificationService';
-import { getAuthenticatedUser, hasManagerAccess } from '@/lib/auth';
+import { getAuthenticatedUser, resolveManagedNames } from '@/lib/auth';
 
 const VALID_PRIORITIES: TaskPriority[] = ['High', 'Medium', 'Low'];
 
@@ -28,7 +28,17 @@ export async function GET(request: NextRequest) {
     }
 
     const provider = getDataProvider();
-    const tasks = await provider.getTasks({ date, employeeName, status, priority });
+    let tasks = await provider.getTasks({ date, employeeName, status, priority });
+
+    // Senior Accountant sees only their own tasks plus their delegated reports' tasks.
+    if (session.role === 'Senior Accountant') {
+      const employees = await provider.getEmployees();
+      const managed = resolveManagedNames(employees, session.email);
+      tasks = tasks.filter(
+        (t) => t.employeeName.toLowerCase() === session.name.toLowerCase() || managed.has(t.employeeName.toLowerCase())
+      );
+    }
+
     return NextResponse.json({ success: true, data: tasks });
   } catch (error: any) {
     return NextResponse.json(
@@ -55,6 +65,16 @@ export async function POST(request: NextRequest) {
 
     if (session.role === 'Manager' || session.role === 'Owner') {
       // Managers and Owner may assign tasks to any employee; source will be ASSIGNED server‑side.
+    } else if (session.role === 'Senior Accountant') {
+      // Senior Accountant may only assign tasks to their delegated reports.
+      const employees = await getDataProvider().getEmployees();
+      const managed = resolveManagedNames(employees, session.email);
+      if (!employeeName || !managed.has(employeeName.trim().toLowerCase())) {
+        return NextResponse.json(
+          { success: false, error: 'Forbidden: You can only assign tasks to employees you manage' },
+          { status: 403 }
+        );
+      }
     } else if (session.role === 'Employee') {
       // Employees can only create tasks for themselves.
       if (employeeName && employeeName.trim().toLowerCase() !== session.name.toLowerCase()) {
@@ -94,8 +114,9 @@ export async function POST(request: NextRequest) {
       priority,
       dueTime: dueTime.trim(),
       date,
-      // Set source based on role
-      source: hasManagerAccess(session.role) ? TaskSource.ASSIGNED : TaskSource.SELF_ADDED,
+      // Set source based on role: only a plain Employee self-adds; every other
+      // role that reaches this point has already passed an assignment-authority check above.
+      source: session.role === 'Employee' ? TaskSource.SELF_ADDED : TaskSource.ASSIGNED,
     };
 
     const provider = getDataProvider();

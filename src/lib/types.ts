@@ -1,4 +1,4 @@
-export type Role = 'Employee' | 'Manager' | 'Owner';
+export type Role = 'Employee' | 'Manager' | 'Owner' | 'Senior Accountant';
 
 // New enum for task origin
 export enum TaskSource {
@@ -16,6 +16,8 @@ export interface Employee {
   email: string;
   role: Role;
   active: boolean;
+  // Names of employees this person may view/assign/manage (Senior Accountant scope).
+  manages?: string[];
 }
 
 export interface Task {

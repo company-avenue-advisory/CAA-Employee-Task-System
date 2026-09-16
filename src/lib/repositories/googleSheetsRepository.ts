@@ -31,7 +31,7 @@ export class GoogleSheetsRepository {
       const sheets = this.getSheetsClient();
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: CONFIG.googleSheets.spreadsheetId,
-        range: 'EMPLOYEES!A2:E',
+        range: 'EMPLOYEES!A2:F',
       });
 
       const rows = response.data.values || [];
@@ -45,9 +45,13 @@ export class GoogleSheetsRepository {
             const raw = row[3] ? row[3].toString().trim().toLowerCase() : '';
             if (raw === 'owner') return 'Owner';
             if (raw === 'manager') return 'Manager';
+            if (raw === 'senior accountant') return 'Senior Accountant';
             return 'Employee';
           })() as Role,
           active: row[4] ? row[4].toString().toLowerCase() === 'true' || row[4].toString() === '1' : true,
+          manages: row[5]
+            ? row[5].toString().split(',').map((n: string) => n.trim()).filter(Boolean)
+            : [],
         }));
     } catch (error) {
       console.warn('Google Sheets getEmployees failed, falling back to mock data:', error);

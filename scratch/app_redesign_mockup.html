@@ -1,0 +1,451 @@
+<title>CAA App Redesign Mockup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+  :root {
+    --bg: #FAF8F4;
+    --canvas: #F3F1EA;
+    --surface: #FFFFFF;
+    --surface-2: #F5F4EF;
+    --border: #E7E4DA;
+    --border-strong: #D8D4C6;
+    --text: #1F2320;
+    --text-muted: #6B6F68;
+    --text-subtle: #9A9D96;
+    --accent: #178A4C;
+    --accent-hover: #106B3B;
+    --accent-tint: #E8F5ED;
+    --assigned: #4A5FBF;
+    --assigned-tint: #ECEEFA;
+    --amber: #B4740E;
+    --amber-tint: #FBF1DE;
+    --red: #C43D3D;
+    --red-tint: #FBEAEA;
+    --gray-badge: #6B6F68;
+    --gray-badge-tint: #EDECE5;
+    --seg-fill: #178A4C;
+    --seg-empty: #E4E1D6;
+    --shadow-sm: 0 1px 2px rgba(31,35,32,0.05);
+    --shadow-md: 0 6px 18px rgba(31,35,32,0.08);
+    --shadow-lg: 0 20px 44px rgba(31,35,32,0.13);
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14140F; --canvas: #191913; --surface: #1F1F19; --surface-2: #262620;
+      --border: #33332B; --border-strong: #40402F;
+      --text: #F2F1EA; --text-muted: #ABAA9C; --text-subtle: #77766A;
+      --accent: #3FC784; --accent-hover: #5AD89B; --accent-tint: #12291D;
+      --assigned: #8C9BF0; --assigned-tint: #1D2140;
+      --amber: #E8AE55; --amber-tint: #2E2308;
+      --red: #E36A6A; --red-tint: #2E1414;
+      --gray-badge: #ABAA9C; --gray-badge-tint: #242419;
+      --seg-fill: #3FC784; --seg-empty: #33332B;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.4); --shadow-md: 0 6px 18px rgba(0,0,0,0.4); --shadow-lg: 0 20px 48px rgba(0,0,0,0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14140F; --canvas: #191913; --surface: #1F1F19; --surface-2: #262620;
+    --border: #33332B; --border-strong: #40402F;
+    --text: #F2F1EA; --text-muted: #ABAA9C; --text-subtle: #77766A;
+    --accent: #3FC784; --accent-hover: #5AD89B; --accent-tint: #12291D;
+    --assigned: #8C9BF0; --assigned-tint: #1D2140;
+    --amber: #E8AE55; --amber-tint: #2E2308;
+    --red: #E36A6A; --red-tint: #2E1414;
+    --gray-badge: #ABAA9C; --gray-badge-tint: #242419;
+    --seg-fill: #3FC784; --seg-empty: #33332B;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.4); --shadow-md: 0 6px 18px rgba(0,0,0,0.4); --shadow-lg: 0 20px 48px rgba(0,0,0,0.55);
+    color-scheme: dark;
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); }
+
+  .page { max-width: 1020px; margin: 0 auto; padding-block: 1.75rem 4rem; }
+
+  .switcher {
+    display: flex; gap: 0.4rem; margin-bottom: 1.5rem;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 999px; padding: 0.3rem; width: fit-content;
+    box-shadow: var(--shadow-sm);
+  }
+  .switch-btn {
+    border: none; background: transparent; cursor: pointer;
+    font-family: var(--font-sans); font-size: 0.85rem; font-weight: 600;
+    color: var(--text-muted); padding: 0.5rem 1.1rem; border-radius: 999px;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .switch-btn.active { background: var(--accent); color: #fff; }
+  .switch-btn:not(.active):hover { background: var(--surface-2); color: var(--text); }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  .frame {
+    background: var(--canvas);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .app-header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 1.5rem;
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 0.65rem; }
+  .brand-mark {
+    width: 32px; height: 32px; border-radius: 9px;
+    background: var(--accent-tint); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.68rem; letter-spacing: 0.02em;
+  }
+  .brand-name { font-weight: 700; font-size: 0.96rem; color: var(--text); }
+  .header-right { display: flex; align-items: center; gap: 0.85rem; }
+  .user-chip {
+    display: flex; align-items: center; gap: 0.55rem;
+    background: var(--surface-2); border: 1px solid var(--border); border-radius: 999px;
+    padding: 0.3rem 0.75rem 0.3rem 0.3rem; font-size: 0.82rem; color: var(--text);
+  }
+  .user-avatar {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--amber-tint); color: var(--amber); font-weight: 800; font-size: 0.65rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .header-right .role { color: var(--text-subtle); font-size: 0.75rem; }
+  .signout {
+    font-size: 0.78rem; color: var(--text-muted);
+    border: 1px solid var(--border-strong); border-radius: 7px;
+    padding: 0.32rem 0.7rem; background: var(--surface);
+  }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    padding: 0.2rem 0.55rem; border-radius: 999px;
+    font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em;
+  }
+  .badge-completed { background: var(--accent-tint); color: var(--accent); }
+  .badge-progress { background: var(--amber-tint); color: var(--amber); }
+  .badge-blocked { background: var(--red-tint); color: var(--red); }
+  .badge-notstarted { background: var(--gray-badge-tint); color: var(--gray-badge); }
+  .badge-priority-high { background: var(--red-tint); color: var(--red); }
+  .badge-priority-medium { background: var(--amber-tint); color: var(--amber); }
+  .badge-assigned { background: var(--assigned-tint); color: var(--assigned); }
+  .badge-self { background: var(--amber-tint); color: var(--amber); }
+
+  /* ---- Login screen ---- */
+  .login-wrap { background: var(--canvas); padding: 3.5rem 1.5rem; display: flex; justify-content: center; }
+  .login-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg); padding: 2.1rem 2rem 1.6rem;
+    width: 100%; max-width: 360px; text-align: center;
+  }
+  .login-mark {
+    width: 52px; height: 52px; border-radius: 13px;
+    background: var(--accent-tint); color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 0.92rem; margin: 0 auto 1.1rem;
+  }
+  .login-card h1 { font-size: 1.25rem; font-weight: 800; margin: 0 0 0.35rem; }
+  .login-card .lede { font-size: 0.88rem; color: var(--text-muted); margin: 0 0 1.5rem; }
+  .google-btn {
+    border: 1px solid var(--border-strong); border-radius: var(--radius-sm);
+    padding: 0.65rem 1rem; font-size: 0.88rem; font-weight: 600; color: var(--text);
+    display: inline-flex; align-items: center; gap: 0.55rem; background: var(--surface);
+    width: 100%; justify-content: center;
+  }
+  .login-foot { margin-top: 1.4rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.72rem; color: var(--text-subtle); }
+
+  /* ---- Employee dashboard ---- */
+  .dash-body { padding: 1.5rem; }
+  .dash-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem; }
+  .dash-title { font-size: 1.05rem; font-weight: 800; }
+  .btn-primary {
+    background: var(--accent); color: #fff; border: none; border-radius: var(--radius-sm);
+    padding: 0.55rem 1.05rem; font-size: 0.85rem; font-weight: 700; font-family: var(--font-sans);
+    display: inline-flex; align-items: center; gap: 0.4rem; cursor: pointer;
+  }
+  .btn-secondary {
+    background: var(--surface); color: var(--text); border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 0.55rem 1.05rem; font-size: 0.85rem; font-weight: 600;
+    font-family: var(--font-sans); cursor: pointer;
+  }
+
+  .task-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm); padding: 1.1rem 1.25rem; margin-bottom: 0.9rem;
+  }
+  .task-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.6rem; flex-wrap: wrap; }
+  .task-id { font-family: ui-monospace, monospace; font-size: 0.7rem; color: var(--text-subtle); background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 0.1rem 0.4rem; }
+  .task-title { font-size: 0.98rem; font-weight: 700; margin-top: 0.3rem; }
+  .task-badges { display: flex; gap: 0.4rem; }
+  .task-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; background: var(--surface-2); border-radius: var(--radius-sm); padding: 0.9rem; margin-bottom: 0.85rem; }
+  .field-label { font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.3rem; display: block; }
+  .select-mock { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 0.4rem 0.6rem; background: var(--surface); font-size: 0.84rem; color: var(--text); }
+
+  /* segmented block progress, PlanIQ-style */
+  .seg-progress { display: flex; align-items: center; gap: 0.5rem; }
+  .seg-track { flex: 1; display: flex; gap: 3px; }
+  .seg-block { flex: 1; height: 7px; border-radius: 2px; background: var(--seg-empty); }
+  .seg-block.filled { background: var(--seg-fill); }
+  .seg-val { font-size: 0.8rem; font-weight: 700; min-width: 32px; text-align: right; font-variant-numeric: tabular-nums; }
+
+  .note-box { border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 0.65rem 0.8rem; font-size: 0.84rem; color: var(--text-muted); background: var(--surface); min-height: 52px; margin-bottom: 0.85rem; }
+
+  .widget-row { display: grid; grid-template-columns: 1.1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; }
+  .widget-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 1.1rem 1.2rem; }
+  .widget-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem; }
+  .widget-title { font-size: 0.85rem; font-weight: 700; }
+  .cal-nav { display: flex; gap: 0.3rem; }
+  .cal-nav button { border: 1px solid var(--border-strong); background: var(--surface); border-radius: 6px; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); cursor: pointer; font-size: 0.7rem; }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+  .cal-dow { font-size: 0.62rem; font-weight: 700; color: var(--text-subtle); text-transform: uppercase; padding-bottom: 0.3rem; }
+  .cal-cell { position: relative; font-size: 0.78rem; color: var(--text); padding: 0.35rem 0; border-radius: 7px; }
+  .cal-cell.other { color: var(--text-subtle); opacity: 0.5; }
+  .cal-cell.today { background: var(--accent); color: #fff; font-weight: 700; }
+  .cal-dot { position: absolute; bottom: 2px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; border-radius: 50%; background: var(--amber); }
+  .cal-cell.today .cal-dot { background: #fff; }
+  .cal-cell.done .cal-dot { background: var(--accent); }
+
+  .streak-row { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.2rem; }
+  .streak-num { font-size: 1.8rem; font-weight: 800; color: var(--accent); font-variant-numeric: tabular-nums; }
+  .streak-lbl { font-size: 0.78rem; color: var(--text-muted); }
+  .streak-note { font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.9rem; }
+  .streak-days { display: flex; gap: 5px; }
+  .streak-day { flex: 1; height: 22px; border-radius: 5px; background: var(--seg-empty); display: flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; color: var(--text-subtle); }
+  .streak-day.hit { background: var(--accent-tint); color: var(--accent); }
+  .streak-day.miss { background: var(--red-tint); color: var(--red); }
+
+  .eod-footer { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); padding: 1.25rem 1.4rem; margin-top: 1.5rem; }
+  .eod-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin-bottom: 1.1rem; }
+  .eod-stat { background: var(--surface-2); border-radius: var(--radius-sm); padding: 0.65rem; text-align: center; }
+  .eod-stat .num { font-size: 1.3rem; font-weight: 800; color: var(--text); font-variant-numeric: tabular-nums; }
+  .eod-stat .lbl { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
+
+  /* ---- Manager dashboard ---- */
+  .metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+  .metric-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 0.9rem; text-align: center; box-shadow: var(--shadow-sm); }
+  .metric-card .val { font-size: 1.5rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+  .metric-card .lbl { font-size: 0.66rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; margin-top: 0.15rem; }
+
+  .roster { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); overflow: hidden; margin-bottom: 1.5rem; }
+  table.roster-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  table.roster-table th { text-align: left; background: var(--surface-2); color: var(--text-muted); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.02em; padding: 0.65rem 0.9rem; border-bottom: 1px solid var(--border); }
+  table.roster-table td { padding: 0.75rem 0.9rem; border-bottom: 1px solid var(--border); }
+  table.roster-table tr:last-child td { border-bottom: none; }
+  .roster-name { display: flex; align-items: center; gap: 0.55rem; font-weight: 600; }
+  .roster-avatar { width: 26px; height: 26px; border-radius: 50%; background: var(--assigned-tint); color: var(--assigned); font-size: 0.68rem; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .status-pill { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.78rem; font-weight: 700; }
+
+  @media (max-width: 640px) {
+    .task-controls, .eod-stats, .widget-row { grid-template-columns: 1fr; }
+    .login-wrap { padding: 2.25rem 1rem; }
+  }
+</style>
+
+<div class="page">
+  <div class="switcher">
+    <button class="switch-btn active" data-screen="login">Login</button>
+    <button class="switch-btn" data-screen="employee">Employee</button>
+    <button class="switch-btn" data-screen="manager">Manager</button>
+  </div>
+
+  <div class="screen active" id="screen-login">
+    <div class="frame">
+      <div class="login-wrap">
+        <div class="login-card">
+          <div class="login-mark">CAA</div>
+          <h1>Daily Task &amp; EOD System</h1>
+          <p class="lede">Sign in with your CAA Google account</p>
+          <div class="google-btn">
+            <svg width="16" height="16" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.48h4.84a4.14 4.14 0 0 1-1.8 2.71v2.26h2.9c1.7-1.57 2.7-3.88 2.7-6.61z"/><path fill="#34A853" d="M9 18c2.43 0 4.47-.8 5.96-2.18l-2.9-2.26c-.8.54-1.84.86-3.06.86-2.35 0-4.34-1.59-5.05-3.72H.95v2.33A9 9 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.95 10.7A5.4 5.4 0 0 1 3.67 9c0-.59.1-1.17.28-1.7V4.97H.95A9 9 0 0 0 0 9c0 1.45.35 2.83.95 4.03l3-2.33z"/><path fill="#EA4335" d="M9 3.58c1.32 0 2.51.46 3.44 1.35l2.58-2.58C13.46.89 11.43 0 9 0A9 9 0 0 0 .95 4.97l3 2.33C4.66 5.17 6.65 3.58 9 3.58z"/></svg>
+            Sign in with Google
+          </div>
+          <div class="login-foot">Authorized access only &middot; role-based permissions</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-employee">
+    <div class="frame">
+      <div class="app-header">
+        <div class="brand"><div class="brand-mark">CAA</div><div class="brand-name">Task &amp; EOD System</div></div>
+        <div class="header-right">
+          <div class="user-chip"><span class="user-avatar">Y</span>Yug<span class="role">&middot; Employee</span></div>
+          <button class="signout">Sign out</button>
+        </div>
+      </div>
+      <div class="dash-body">
+        <div class="widget-row">
+          <div class="widget-card">
+            <div class="widget-head">
+              <span class="widget-title">September 2026</span>
+              <div class="cal-nav"><button aria-label="Previous month">&#8249;</button><button aria-label="Next month">&#8250;</button></div>
+            </div>
+            <div class="cal-grid">
+              <span class="cal-dow">Mo</span><span class="cal-dow">Tu</span><span class="cal-dow">We</span><span class="cal-dow">Th</span><span class="cal-dow">Fr</span><span class="cal-dow">Sa</span><span class="cal-dow">Su</span>
+              <span class="cal-cell other">31</span><span class="cal-cell">1</span><span class="cal-cell">2</span><span class="cal-cell">3</span><span class="cal-cell">4</span><span class="cal-cell">5</span><span class="cal-cell">6</span>
+              <span class="cal-cell">7</span><span class="cal-cell">8</span><span class="cal-cell">9</span><span class="cal-cell">10</span><span class="cal-cell">11</span><span class="cal-cell">12</span><span class="cal-cell">13</span>
+              <span class="cal-cell done">14<span class="cal-dot"></span></span><span class="cal-cell today">15<span class="cal-dot"></span></span><span class="cal-cell">16</span><span class="cal-cell">17</span><span class="cal-cell">18</span><span class="cal-cell">19</span><span class="cal-cell">20</span>
+              <span class="cal-cell">21</span><span class="cal-cell">22</span><span class="cal-cell">23</span><span class="cal-cell">24</span><span class="cal-cell">25</span><span class="cal-cell">26</span><span class="cal-cell">27</span>
+              <span class="cal-cell">28</span><span class="cal-cell">29</span><span class="cal-cell">30</span><span class="cal-cell other">1</span><span class="cal-cell other">2</span><span class="cal-cell other">3</span><span class="cal-cell other">4</span>
+            </div>
+          </div>
+          <div class="widget-card">
+            <div class="widget-head"><span class="widget-title">EOD streak</span></div>
+            <div class="streak-row"><span class="streak-num">4</span><span class="streak-lbl">day streak</span></div>
+            <div class="streak-note">Submitted 12 of 14 working days this month</div>
+            <div class="streak-days">
+              <span class="streak-day hit">M</span><span class="streak-day hit">T</span><span class="streak-day miss">W</span><span class="streak-day hit">T</span><span class="streak-day hit">F</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="dash-title-row">
+          <div class="dash-title">Your daily tasks (2)</div>
+          <button class="btn-primary">+ Add work I took up</button>
+        </div>
+
+        <div class="task-card">
+          <div class="task-top">
+            <div><span class="task-id">TASK-0004</span><div class="task-title">SDE intern shortlisting</div></div>
+            <div class="task-badges">
+              <span class="badge badge-priority-high">High</span>
+              <span class="badge badge-progress">In progress</span>
+              <span class="badge badge-assigned">Assigned</span>
+            </div>
+          </div>
+          <div class="task-controls">
+            <div><span class="field-label">Status</span><div class="select-mock">In Progress</div></div>
+            <div>
+              <span class="field-label">Progress</span>
+              <div class="seg-progress">
+                <div class="seg-track">
+                  <div class="seg-block filled"></div><div class="seg-block filled"></div><div class="seg-block filled"></div><div class="seg-block filled"></div><div class="seg-block filled"></div><div class="seg-block filled"></div>
+                  <div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div>
+                </div>
+                <span class="seg-val">60%</span>
+              </div>
+            </div>
+          </div>
+          <span class="field-label">EOD note</span>
+          <div class="note-box">Shortlisted 8 of 20 resumes, scheduling first round calls tomorrow.</div>
+          <button class="btn-secondary">Save update</button>
+        </div>
+
+        <div class="task-card">
+          <div class="task-top">
+            <div><span class="task-id">TASK-0003</span><div class="task-title">ZOHO CRM cleanup</div></div>
+            <div class="task-badges">
+              <span class="badge badge-priority-medium">Medium</span>
+              <span class="badge badge-notstarted">Not started</span>
+              <span class="badge badge-self">Self-initiated</span>
+            </div>
+          </div>
+          <div class="task-controls">
+            <div><span class="field-label">Status</span><div class="select-mock">Not Started</div></div>
+            <div>
+              <span class="field-label">Progress</span>
+              <div class="seg-progress">
+                <div class="seg-track">
+                  <div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div>
+                </div>
+                <span class="seg-val">0%</span>
+              </div>
+            </div>
+          </div>
+          <span class="field-label">EOD note</span>
+          <div class="note-box" style="color: var(--text-subtle);">No EOD note added yet.</div>
+          <button class="btn-secondary">Save update</button>
+        </div>
+
+        <div class="eod-footer">
+          <div class="eod-stats">
+            <div class="eod-stat"><div class="num">2</div><div class="lbl">Total tasks</div></div>
+            <div class="eod-stat"><div class="num">0</div><div class="lbl">Completed</div></div>
+            <div class="eod-stat"><div class="num">30%</div><div class="lbl">Avg progress</div></div>
+          </div>
+          <button class="btn-primary" style="width:100%; justify-content:center;">Submit today's EOD</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-manager">
+    <div class="frame">
+      <div class="app-header">
+        <div class="brand"><div class="brand-mark">CAA</div><div class="brand-name">Task &amp; EOD System</div></div>
+        <div class="header-right">
+          <div class="user-chip"><span class="user-avatar" style="background:var(--accent-tint); color:var(--accent);">A</span>Anshika<span class="role">&middot; Manager</span></div>
+          <button class="signout">Sign out</button>
+        </div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-title-row">
+          <div class="dash-title">Team operations dashboard</div>
+          <button class="btn-primary">+ Assign new task</button>
+        </div>
+
+        <div class="metric-grid">
+          <div class="metric-card"><div class="val">4</div><div class="lbl">Total tasks</div></div>
+          <div class="metric-card"><div class="val" style="color:var(--accent)">1</div><div class="lbl">Completed</div></div>
+          <div class="metric-card"><div class="val" style="color:var(--amber)">1</div><div class="lbl">In progress</div></div>
+          <div class="metric-card"><div class="val" style="color:var(--red)">0</div><div class="lbl">Blocked</div></div>
+          <div class="metric-card"><div class="val" style="color:var(--accent)">1</div><div class="lbl">EOD submitted</div></div>
+          <div class="metric-card"><div class="val" style="color:var(--amber)">3</div><div class="lbl">EOD pending</div></div>
+        </div>
+
+        <div class="roster">
+          <table class="roster-table">
+            <thead><tr><th>Employee</th><th>Tasks</th><th>Progress</th><th>EOD status</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="roster-name"><span class="roster-avatar">Y</span>Yug</td>
+                <td>2</td>
+                <td>
+                  <div class="seg-progress" style="max-width:110px">
+                    <div class="seg-track"><div class="seg-block filled"></div><div class="seg-block filled"></div><div class="seg-block filled"></div><div class="seg-block filled"></div><div class="seg-block filled"></div><div class="seg-block filled"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div></div>
+                    <span class="seg-val" style="font-size:0.78rem">60%</span>
+                  </div>
+                </td>
+                <td><span class="status-pill" style="color:var(--amber)">&#9679; Pending</span></td>
+              </tr>
+              <tr>
+                <td class="roster-name"><span class="roster-avatar">S</span>Sunit</td>
+                <td>1</td>
+                <td>
+                  <div class="seg-progress" style="max-width:110px">
+                    <div class="seg-track"><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div><div class="seg-block"></div></div>
+                    <span class="seg-val" style="font-size:0.78rem">0%</span>
+                  </div>
+                </td>
+                <td><span class="status-pill" style="color:var(--amber)">&#9679; Pending</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var buttons = Array.prototype.slice.call(document.querySelectorAll('.switch-btn'));
+  var screens = Array.prototype.slice.call(document.querySelectorAll('.screen'));
+  buttons.forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      buttons.forEach(function (b) { b.classList.remove('active'); });
+      screens.forEach(function (s) { s.classList.remove('active'); });
+      btn.classList.add('active');
+      document.getElementById('screen-' + btn.dataset.screen).classList.add('active');
+    });
+  });
+</script>

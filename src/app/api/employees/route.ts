@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDataProvider } from '@/lib/repositories/dataProvider';
-import { getAuthenticatedUser } from '@/lib/auth';
+import { getAuthenticatedUser, resolveManagedNames } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
@@ -20,6 +20,14 @@ export async function GET(request: NextRequest) {
         (e) => e.email.toLowerCase() === session.email.toLowerCase()
       );
       return NextResponse.json({ success: true, data: self });
+    }
+
+    if (session.role === 'Senior Accountant') {
+      const managed = resolveManagedNames(employees, session.email);
+      const scoped = employees.filter(
+        (e) => e.email.toLowerCase() === session.email.toLowerCase() || managed.has(e.name.toLowerCase())
+      );
+      return NextResponse.json({ success: true, data: scoped });
     }
 
     return NextResponse.json({ success: true, data: employees });

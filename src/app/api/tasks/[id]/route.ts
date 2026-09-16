@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDataProvider } from '@/lib/repositories/dataProvider';
 import { TaskStatus, TaskPriority } from '@/lib/types';
-import { getAuthenticatedUser, hasManagerAccess } from '@/lib/auth';
+import { getAuthenticatedUser, hasManagerAccess, resolveManagedNames } from '@/lib/auth';
 
 const VALID_STATUSES: TaskStatus[] = ['Not Started', 'In Progress', 'Blocked', 'Completed'];
 const VALID_PRIORITIES: TaskPriority[] = ['High', 'Medium', 'Low'];
@@ -84,6 +84,27 @@ export async function PUT(
           { status: 400 }
         );
       }
+    } else if (session.role === 'Senior Accountant') {
+      const isSelf = existingTask.employeeName.toLowerCase() === session.name.toLowerCase();
+      if (!isSelf) {
+        const employees = await provider.getEmployees();
+        const managed = resolveManagedNames(employees, session.email);
+        if (!managed.has(existingTask.employeeName.toLowerCase())) {
+          return NextResponse.json(
+            { success: false, error: 'Forbidden: You can only update tasks for employees you manage' },
+            { status: 403 }
+          );
+        }
+      } else if (existingTask.eodSubmitted) {
+        // Same EOD lock applies to their own tasks as any employee.
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Forbidden: Today's EOD has already been submitted for this task. Ask your manager to reopen EOD if corrections are required.",
+          },
+          { status: 400 }
+        );
+      }
     }
 
     const updated = await provider.updateTask(id, updateData);
@@ -109,16 +130,29 @@ export async function DELETE(
       );
     }
 
-    // Authorization rule: ONLY Managers/Owner can delete tasks
-    if (!hasManagerAccess(session.role)) {
-      return NextResponse.json(
-        { success: false, error: 'Forbidden: Only Managers can delete tasks' },
-        { status: 403 }
-      );
-    }
-
     const { id } = params;
     const provider = getDataProvider();
+
+    // Authorization rule: Managers/Owner can delete any task; Senior Accountant only
+    // tasks belonging to the employees they manage.
+    if (!hasManagerAccess(session.role)) {
+      if (session.role !== 'Senior Accountant') {
+        return NextResponse.json(
+          { success: false, error: 'Forbidden: Only Managers can delete tasks' },
+          { status: 403 }
+        );
+      }
+      const [tasks, employees] = await Promise.all([provider.getTasks(), provider.getEmployees()]);
+      const target = tasks.find((t) => t.id === id);
+      const managed = resolveManagedNames(employees, session.email);
+      if (!target || !managed.has(target.employeeName.toLowerCase())) {
+        return NextResponse.json(
+          { success: false, error: 'Forbidden: You can only delete tasks for employees you manage' },
+          { status: 403 }
+        );
+      }
+    }
+
     const success = await provider.deleteTask(id);
     return NextResponse.json({ success });
   } catch (error: any) {

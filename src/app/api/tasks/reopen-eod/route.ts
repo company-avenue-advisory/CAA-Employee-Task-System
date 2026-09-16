@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDataProvider } from '@/lib/repositories/dataProvider';
-import { getAuthenticatedUser, hasManagerAccess } from '@/lib/auth';
+import { getAuthenticatedUser, hasManagerAccess, resolveManagedNames } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,14 +9,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { success: false, error: 'Unauthorized: Authentication required' },
         { status: 401 }
-      );
-    }
-
-    // Authorization check: ONLY Managers/Owner can reopen an employee's EOD
-    if (!hasManagerAccess(session.role)) {
-      return NextResponse.json(
-        { success: false, error: 'Forbidden: Only Managers can reopen an EOD submission' },
-        { status: 403 }
       );
     }
 
@@ -31,6 +23,26 @@ export async function POST(request: NextRequest) {
     }
 
     const provider = getDataProvider();
+
+    // Authorization: Managers/Owner can reopen anyone's EOD; Senior Accountant
+    // only for the employees they manage.
+    if (!hasManagerAccess(session.role)) {
+      if (session.role !== 'Senior Accountant') {
+        return NextResponse.json(
+          { success: false, error: 'Forbidden: Only Managers can reopen an EOD submission' },
+          { status: 403 }
+        );
+      }
+      const employees = await provider.getEmployees();
+      const managed = resolveManagedNames(employees, session.email);
+      if (!managed.has(employeeName.trim().toLowerCase())) {
+        return NextResponse.json(
+          { success: false, error: 'Forbidden: You can only reopen EOD for employees you manage' },
+          { status: 403 }
+        );
+      }
+    }
+
     const result = await provider.reopenEOD(employeeName, date);
 
     return NextResponse.json({

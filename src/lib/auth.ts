@@ -32,6 +32,18 @@ export function isOwner(role: Role): boolean {
   return role === 'Owner';
 }
 
+export function isSeniorAccountant(role: Role): boolean {
+  return role === 'Senior Accountant';
+}
+
+// Resolves the live "manages" scope for a Senior Accountant by re-reading the
+// EMPLOYEES sheet at request time (never trusts the session cookie for this),
+// so a scope change takes effect immediately rather than after the 24h token expires.
+export function resolveManagedNames(employees: Employee[], sessionEmail: string): Set<string> {
+  const self = employees.find((e) => e.email.toLowerCase() === sessionEmail.toLowerCase());
+  return new Set((self?.manages || []).map((n) => n.toLowerCase()));
+}
+
 export function createSessionToken(employee: Employee): string {
   const header = { alg: 'HS256', typ: 'JWT' };
   const payload: UserSession = {

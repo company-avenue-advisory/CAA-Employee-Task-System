@@ -10,6 +10,18 @@ EOD reporting is **task-level**, not a separate generic daily form. Each task co
 
 ---
 
+## Preview
+
+| Login | Employee | Manager |
+|---|---|---|
+| ![Login screen](docs/screenshots/login.png) | ![Employee dashboard](docs/screenshots/employee.png) | ![Manager dashboard](docs/screenshots/manager.png) |
+
+| Task history calendar | Due time picker |
+|---|---|
+| ![History calendar](docs/screenshots/history.png) | ![Due time picker](docs/screenshots/due_time.png) |
+
+---
+
 ## Key Features
 
 - **Employee View**:

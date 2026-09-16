@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Task, TaskStatus } from '@/lib/types';
 import { StatusBadge, PriorityBadge } from './StatusBadge';
+import { formatDueTime } from '@/lib/dateUtils';
 import { Clock, ExternalLink, Save, CheckCircle, Lock } from 'lucide-react';
 
 interface TaskCardProps {
@@ -83,7 +84,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
       <div className="task-meta">
         <div className="meta-item">
           <Clock size={14} />
-          <span>Due: {task.dueTime}</span>
+          <span>Due: {formatDueTime(task.dueTime)}</span>
         </div>
         {task.outputLink && (
           <div className="meta-item">

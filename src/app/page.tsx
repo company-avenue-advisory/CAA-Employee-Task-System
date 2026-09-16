@@ -9,8 +9,10 @@ import { ManagerDashboard } from '@/components/ManagerDashboard';
 import { AdminDashboard } from '@/components/AdminDashboard';
 import { Loader2 } from 'lucide-react';
 
-function hasManagerAccess(role: string): boolean {
-  return role === 'Manager' || role === 'Owner';
+// Anyone who gets some form of team dashboard (full for Manager/Owner, scoped
+// server-side to their delegated reports for Senior Accountant).
+function hasTeamView(role: string): boolean {
+  return role === 'Manager' || role === 'Owner' || role === 'Senior Accountant';
 }
 
 export default function Home() {
@@ -21,7 +23,15 @@ export default function Home() {
   const [authChecked, setAuthChecked] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'team' | 'admin'>('team');
+  const [activeTab, setActiveTab] = useState<'team' | 'admin' | 'my'>('team');
+
+  // Senior Accountant's primary identity is still "employee doing their own work";
+  // default them to their personal view rather than the team-assign view.
+  useEffect(() => {
+    if (currentEmployee?.role === 'Senior Accountant') {
+      setActiveTab('my');
+    }
+  }, [currentEmployee?.role]);
 
   // Check authenticated session on load
   const checkAuthSession = async () => {
@@ -224,8 +234,15 @@ export default function Home() {
       />
 
       <main className="main-content">
-        {currentEmployee.role === 'Owner' && (
+        {hasTeamView(currentEmployee.role) && (
           <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+            <button
+              type="button"
+              className={activeTab === 'my' ? 'btn btn-primary' : 'btn btn-secondary'}
+              onClick={() => setActiveTab('my')}
+            >
+              My Tasks
+            </button>
             <button
               type="button"
               className={activeTab === 'team' ? 'btn btn-primary' : 'btn btn-secondary'}
@@ -233,13 +250,15 @@ export default function Home() {
             >
               Team
             </button>
-            <button
-              type="button"
-              className={activeTab === 'admin' ? 'btn btn-primary' : 'btn btn-secondary'}
-              onClick={() => setActiveTab('admin')}
-            >
-              Admin
-            </button>
+            {currentEmployee.role === 'Owner' && (
+              <button
+                type="button"
+                className={activeTab === 'admin' ? 'btn btn-primary' : 'btn btn-secondary'}
+                onClick={() => setActiveTab('admin')}
+              >
+                Admin
+              </button>
+            )}
           </div>
         )}
 
@@ -251,7 +270,7 @@ export default function Home() {
             onReopenEOD={handleReopenEOD}
             onDeleteTask={handleDeleteTask}
           />
-        ) : hasManagerAccess(currentEmployee.role) ? (
+        ) : hasTeamView(currentEmployee.role) && activeTab === 'team' ? (
           <ManagerDashboard
             employees={employees}
             tasks={tasks}

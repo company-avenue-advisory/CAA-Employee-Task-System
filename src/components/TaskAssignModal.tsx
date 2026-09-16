@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Employee, TaskPriority } from '@/lib/types';
+import { defaultDueDateTime } from '@/lib/dateUtils';
 import { X, PlusCircle } from 'lucide-react';
 
 interface TaskAssignModalProps {
@@ -27,7 +28,7 @@ export const TaskAssignModal: React.FC<TaskAssignModalProps> = ({
   const [task, setTask] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<TaskPriority>('Medium');
-  const [dueTime, setDueTime] = useState('5:00 PM');
+  const [dueTime, setDueTime] = useState(defaultDueDateTime());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -57,6 +58,7 @@ export const TaskAssignModal: React.FC<TaskAssignModalProps> = ({
       // Reset form
       setTask('');
       setDescription('');
+      setDueTime(defaultDueDateTime());
       onClose();
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to assign task');
@@ -145,11 +147,11 @@ export const TaskAssignModal: React.FC<TaskAssignModalProps> = ({
               <label htmlFor="assign-duetime">Due Time</label>
               <input
                 id="assign-duetime"
-                type="text"
+                type="datetime-local"
                 className="text-input"
-                placeholder="e.g. 5:00 PM"
                 value={dueTime}
                 onChange={(e) => setDueTime(e.target.value)}
+                required
               />
             </div>
           </div>

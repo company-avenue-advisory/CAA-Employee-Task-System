@@ -3,6 +3,7 @@ import { Employee, Task, TaskPriority, TaskStatus, EmployeeSummary } from '@/lib
 import { StatusBadge, PriorityBadge } from './StatusBadge';
 import { SourceBadge } from './SourceBadge';
 import { TaskAssignModal } from './TaskAssignModal';
+import { formatDueTime } from '@/lib/dateUtils';
 import {
   Calendar,
   Plus,
@@ -394,7 +395,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '0.75rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem' }}>
-                  <Clock size={14} /> Due: {task.dueTime}
+                  <Clock size={14} /> Due: {formatDueTime(task.dueTime)}
                 </div>
                 <div>Progress: <strong>{task.progress}%</strong></div>
                 {task.outputLink && (
@@ -484,6 +485,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
             <div className="form-group" style={{ marginBottom: '1.25rem' }}>
               <label>Due Time</label>
               <input
+                type="datetime-local"
                 className="text-input"
                 value={editingTask.dueTime}
                 onChange={(e) => setEditingTask({ ...editingTask, dueTime: e.target.value })}
