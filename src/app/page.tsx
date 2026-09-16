@@ -145,6 +145,7 @@ export default function Home() {
     description: string;
     priority: TaskPriority;
     dueTime: string;
+    client: string;
   }) => {
     if (!currentEmployee) return;
 

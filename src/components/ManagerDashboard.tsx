@@ -4,6 +4,7 @@ import { StatusBadge, PriorityBadge } from './StatusBadge';
 import { SourceBadge } from './SourceBadge';
 import { TaskAssignModal } from './TaskAssignModal';
 import { formatDueTime } from '@/lib/dateUtils';
+import { KNOWN_CLIENTS } from '@/lib/clients';
 import {
   Calendar,
   Plus,
@@ -27,6 +28,7 @@ interface ManagerDashboardProps {
     description: string;
     priority: TaskPriority;
     dueTime: string;
+    client: string;
   }) => Promise<void>;
   onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
   onReopenEOD: (employeeName: string) => Promise<void>;
@@ -358,6 +360,11 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                     <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--caa-blue)', background: 'var(--caa-blue-light)', padding: '0.1rem 0.5rem', borderRadius: '4px' }}>
                       Assigned to: {task.employeeName}
                     </span>
+                    {task.client && (
+                      <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--assigned)', background: 'var(--assigned-light)', padding: '0.1rem 0.5rem', borderRadius: '4px' }}>
+                        Client: {task.client}
+                      </span>
+                    )}
                   </div>
                   <h3 style={{ fontSize: '1.05rem', fontWeight: 700, marginTop: '0.35rem' }}>
                     {task.task}
@@ -482,7 +489,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 <option value="Low">Low</option>
               </select>
             </div>
-            <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+            <div className="form-group" style={{ marginBottom: '1rem' }}>
               <label>Due Time</label>
               <input
                 type="datetime-local"
@@ -490,6 +497,19 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                 value={editingTask.dueTime}
                 onChange={(e) => setEditingTask({ ...editingTask, dueTime: e.target.value })}
               />
+            </div>
+            <div className="form-group" style={{ marginBottom: '1.25rem' }}>
+              <label>Client (Optional)</label>
+              <select
+                className="select-input"
+                value={editingTask.client || ''}
+                onChange={(e) => setEditingTask({ ...editingTask, client: e.target.value })}
+              >
+                <option value="">No client</option>
+                {KNOWN_CLIENTS.map((name) => (
+                  <option key={name} value={name}>{name}</option>
+                ))}
+              </select>
             </div>
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.75rem' }}>
               <button
@@ -508,6 +528,7 @@ export const ManagerDashboard: React.FC<ManagerDashboardProps> = ({
                     task: editingTask.task,
                     priority: editingTask.priority,
                     dueTime: editingTask.dueTime,
+                    client: editingTask.client || '',
                   });
                   setEditingTask(null);
                 }}

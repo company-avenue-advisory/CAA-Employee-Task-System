@@ -38,6 +38,8 @@ export interface Task {
   updatedAt: string;
   // New field indicating who created the task
   source: TaskSource;
+  // Client/firm this task's work is for, e.g. "Marque", "Onestack MH". Optional — older tasks predate this field.
+  client?: string;
 }
 
 export interface TaskFilterOptions {
@@ -56,6 +58,7 @@ export interface CreateTaskInput {
   date?: string;
   // source is set server‑side; optional for backward compatibility
   source?: TaskSource;
+  client?: string;
 }
 
 
@@ -70,6 +73,7 @@ export interface UpdateTaskInput {
   dueTime?: string;
   employeeName?: string;
   eodSubmitted?: boolean;
+  client?: string;
 }
 
 export interface TeamSummary {

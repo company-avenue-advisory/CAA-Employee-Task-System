@@ -3,6 +3,7 @@ import { Employee, Task, TaskPriority } from '@/lib/types';
 import { TaskCard } from './TaskCard';
 import { EODSubmitFooter } from './EODSubmitFooter';
 import { defaultDueDateTime, formatDueTime } from '@/lib/dateUtils';
+import { KNOWN_CLIENTS } from '@/lib/clients';
 import { Calendar, CheckCircle2, ListTodo, Clock, X } from 'lucide-react';
 
 interface EmployeeDashboardProps {
@@ -145,6 +146,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
   const [newDescription, setNewDescription] = useState('');
   const [newPriority, setNewPriority] = useState<TaskPriority>('Medium');
   const [newDueTime, setNewDueTime] = useState(defaultDueDateTime());
+  const [newClient, setNewClient] = useState('');
 
   // null = viewing "Today"; a 'YYYY-MM-DD' string = browsing a past day's history (read-only)
   const [viewDate, setViewDate] = useState<string | null>(null);
@@ -385,6 +387,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
                           description: newDescription,
                           priority: newPriority,
                           dueTime: newDueTime,
+                          client: newClient,
                           date: new Date().toISOString().split('T')[0],
                         }),
                       });
@@ -418,6 +421,15 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
                   <div className="form-group">
                     <label>Due Time</label>
                     <input type="datetime-local" className="text-input" value={newDueTime} onChange={e => setNewDueTime(e.target.value)} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Client (Optional)</label>
+                    <select className="select-input" value={newClient} onChange={e => setNewClient(e.target.value)}>
+                      <option value="">No client</option>
+                      {KNOWN_CLIENTS.map((name) => (
+                        <option key={name} value={name}>{name}</option>
+                      ))}
+                    </select>
                   </div>
                   {errorMessage && <div style={{ color: 'var(--status-blocked-text)' }}>{errorMessage}</div>}
                   <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>

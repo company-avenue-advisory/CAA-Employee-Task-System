@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Employee, Task, TaskSource, TaskStatus } from '@/lib/types';
-import { Calendar, Filter, Award, AlertTriangle, TrendingUp, Users } from 'lucide-react';
+import { Calendar, Filter, Award, AlertTriangle, TrendingUp, Users, Building2 } from 'lucide-react';
 
 interface EOMReportProps {
   employees: Employee[];
@@ -362,6 +362,41 @@ export const EOMReport: React.FC<EOMReportProps> = ({ employees, tasks }) => {
   // --- Workload distribution ---
   const workload = [...employeeStats].sort((a, b) => b.total - a.total).map((e) => ({ label: e.employeeName, value: e.total, color: 'var(--caa-blue)' }));
 
+  // --- Client x Employee breakdown ---
+  const NO_CLIENT = 'No client tagged';
+  const clientMap = new Map<string, Map<string, Task[]>>();
+  filteredTasks.forEach((t) => {
+    const clientKey = t.client && t.client.trim() ? t.client.trim() : NO_CLIENT;
+    if (!clientMap.has(clientKey)) clientMap.set(clientKey, new Map());
+    const empMap = clientMap.get(clientKey)!;
+    const empKey = t.employeeName || 'Unknown';
+    if (!empMap.has(empKey)) empMap.set(empKey, []);
+    empMap.get(empKey)!.push(t);
+  });
+  const clientTotal = (empMap: Map<string, Task[]>) =>
+    Array.from(empMap.values()).reduce((sum, arr) => sum + arr.length, 0);
+  const clientRows: { client: string; employeeName: string; total: number; avgProgress: number; firstOfClient: boolean; clientTaskCount: number }[] = [];
+  Array.from(clientMap.entries())
+    .sort((a, b) => {
+      if (a[0] === NO_CLIENT) return 1;
+      if (b[0] === NO_CLIENT) return -1;
+      return clientTotal(b[1]) - clientTotal(a[1]);
+    })
+    .forEach(([clientName, empMap]) => {
+      const rowsForClient = Array.from(empMap.entries()).sort((a, b) => b[1].length - a[1].length);
+      rowsForClient.forEach(([empName, empTasks], idx) => {
+        const avgProgress = Math.round(empTasks.reduce((s, t) => s + (t.progress || 0), 0) / empTasks.length);
+        clientRows.push({
+          client: clientName,
+          employeeName: empName,
+          total: empTasks.length,
+          avgProgress,
+          firstOfClient: idx === 0,
+          clientTaskCount: clientTotal(empMap),
+        });
+      });
+    });
+
   // --- Blocked / pending work ---
   const statusRank: Record<string, number> = { 'Blocked': 0, 'In Progress': 1, 'Not Started': 2, 'Completed': 3 };
   const pendingWork = filteredTasks
@@ -511,6 +546,41 @@ export const EOMReport: React.FC<EOMReportProps> = ({ employees, tasks }) => {
                     <td style={{ textAlign: 'center', color: STATUS_COLORS['Blocked'] }}>{e.blocked}</td>
                     <td style={{ textAlign: 'center' }}>{e.avgProgress}%</td>
                     <td style={{ textAlign: 'center' }}>{e.eodPct}%</td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Client x Employee breakdown */}
+      <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ ...chartTitleStyle, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          <Building2 size={18} color="var(--caa-blue)" /> Client Breakdown
+        </div>
+        <div className="table-container">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>Client</th>
+                <th>Employee</th>
+                <th style={{ textAlign: 'center' }}>Tasks</th>
+                <th style={{ textAlign: 'center' }}>Avg Progress</th>
+              </tr>
+            </thead>
+            <tbody>
+              {clientRows.length === 0 ? (
+                <tr><td colSpan={4} style={{ textAlign: 'center', color: 'var(--text-muted)' }}>No data for this selection.</td></tr>
+              ) : (
+                clientRows.map((r, idx) => (
+                  <tr key={`${r.client}-${r.employeeName}-${idx}`}>
+                    <td style={{ fontWeight: r.firstOfClient ? 700 : 400, color: r.client === NO_CLIENT ? 'var(--text-subtle)' : 'var(--text-main)' }}>
+                      {r.firstOfClient ? `${r.client} (${r.clientTaskCount})` : ''}
+                    </td>
+                    <td>{r.employeeName}</td>
+                    <td style={{ textAlign: 'center' }}>{r.total}</td>
+                    <td style={{ textAlign: 'center' }}>{r.avgProgress}%</td>
                   </tr>
                 ))
               )}

@@ -68,7 +68,7 @@ export class GoogleSheetsRepository {
       const sheets = this.getSheetsClient();
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: CONFIG.googleSheets.spreadsheetId,
-        range: 'TASKS!A2:O',
+        range: 'TASKS!A2:P',
       });
 
       const rows = response.data.values || [];
@@ -88,6 +88,7 @@ export class GoogleSheetsRepository {
         createdAt: row[12] || new Date().toISOString(),
         updatedAt: row[13] || new Date().toISOString(),
         source: (row[14] as any) || TaskSource.ASSIGNED,
+        client: row[15] || '',
       }));
 
       if (filter) {
@@ -133,12 +134,13 @@ export class GoogleSheetsRepository {
         now,
         // Source column based on input.source
         input.source ?? TaskSource.ASSIGNED,
+        input.client || '',
       ];
 
       const sheets = this.getSheetsClient();
       await sheets.spreadsheets.values.append({
         spreadsheetId: CONFIG.googleSheets.spreadsheetId,
-        range: 'TASKS!A:O',
+        range: 'TASKS!A:P',
         valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: [newRow],
@@ -161,6 +163,7 @@ export class GoogleSheetsRepository {
         createdAt: now,
         updatedAt: now,
         source: input.source ?? TaskSource.ASSIGNED,
+        client: input.client || '',
       };
     } catch (error) {
       console.warn('Google Sheets createTask failed, falling back to mock data:', error);
@@ -177,7 +180,7 @@ export class GoogleSheetsRepository {
       const sheets = this.getSheetsClient();
       const response = await sheets.spreadsheets.values.get({
         spreadsheetId: CONFIG.googleSheets.spreadsheetId,
-        range: 'TASKS!A2:O',
+        range: 'TASKS!A2:P',
       });
 
       const rows = response.data.values || [];
@@ -203,12 +206,13 @@ export class GoogleSheetsRepository {
         currentRow[12],
         now,
         currentRow[14],
+        input.client ?? currentRow[15],
       ];
 
       const sheetRowNumber = rowIndex + 2; // 1-based index + header row
       await sheets.spreadsheets.values.update({
         spreadsheetId: CONFIG.googleSheets.spreadsheetId,
-        range: `TASKS!A${sheetRowNumber}:O${sheetRowNumber}`,
+        range: `TASKS!A${sheetRowNumber}:P${sheetRowNumber}`,
         valueInputOption: 'USER_ENTERED',
         requestBody: {
           values: [updatedRow],
@@ -231,6 +235,7 @@ export class GoogleSheetsRepository {
         createdAt: currentRow[12],
         updatedAt: now,
         source: updatedRow[14] as TaskSource,
+        client: updatedRow[15] || '',
       };
     } catch (error) {
       console.warn('Google Sheets updateTask failed, falling back to mock data:', error);

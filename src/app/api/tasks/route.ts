@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
     // Authorization: Managers can assign tasks to any employee;
     // Employees can self-add tasks for themselves only.
     const body = await request.json();
-    const { employeeName, task, description, priority, dueTime, date } = body;
+    const { employeeName, task, description, priority, dueTime, date, client } = body;
 
     const provider = getDataProvider();
     const employees = await provider.getEmployees();
@@ -119,6 +119,7 @@ export async function POST(request: NextRequest) {
       priority,
       dueTime: dueTime.trim(),
       date,
+      client: client ? client.trim() : '',
       // Set source based on role: only a plain Employee self-adds; every other
       // role that reaches this point has already passed an assignment-authority check above.
       source: currentRole === 'Employee' ? TaskSource.SELF_ADDED : TaskSource.ASSIGNED,

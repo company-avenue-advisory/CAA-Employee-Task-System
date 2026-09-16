@@ -1,0 +1,118 @@
+<title>Client Field Mockup</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+  :root {
+    --bg: #FAF8F4; --surface: #FFFFFF; --surface-2: #F5F4EF;
+    --border: #E7E4DA; --border-strong: #D8D4C6;
+    --text: #1F2320; --text-muted: #6B6F68; --text-subtle: #9A9D96;
+    --accent: #178A4C; --accent-tint: #E8F5ED;
+    --assigned: #4A5FBF; --assigned-tint: #ECEEFA;
+    --amber: #B4740E; --amber-tint: #FBF1DE;
+    --shadow-sm: 0 1px 2px rgba(31,35,32,0.05);
+    --shadow-md: 0 6px 18px rgba(31,35,32,0.08);
+    --shadow-lg: 0 20px 44px rgba(31,35,32,0.13);
+    --radius-lg: 16px; --radius-md: 12px; --radius-sm: 8px;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14140F; --surface: #1F1F19; --surface-2: #262620;
+      --border: #33332B; --border-strong: #40402F;
+      --text: #F2F1EA; --text-muted: #ABAA9C; --text-subtle: #77766A;
+      --accent: #3FC784; --accent-tint: #12291D;
+      --assigned: #8C9BF0; --assigned-tint: #1D2140;
+      --amber: #E8AE55; --amber-tint: #2E2308;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.4); --shadow-md: 0 6px 18px rgba(0,0,0,0.4); --shadow-lg: 0 20px 48px rgba(0,0,0,0.55);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14140F; --surface: #1F1F19; --surface-2: #262620;
+    --border: #33332B; --border-strong: #40402F;
+    --text: #F2F1EA; --text-muted: #ABAA9C; --text-subtle: #77766A;
+    --accent: #3FC784; --accent-tint: #12291D;
+    --assigned: #8C9BF0; --assigned-tint: #1D2140;
+    --amber: #E8AE55; --amber-tint: #2E2308;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,0.4); --shadow-md: 0 6px 18px rgba(0,0,0,0.4); --shadow-lg: 0 20px 48px rgba(0,0,0,0.55);
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--text); font-family: var(--font-sans); }
+  .wrap { max-width: 900px; margin: 0 auto; display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start; }
+
+  .modal-card { flex: 1 1 360px; max-width: 400px; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 1.5rem; }
+  .modal-title { font-size: 1.05rem; font-weight: 800; margin-bottom: 1rem; padding-bottom: 0.9rem; border-bottom: 1px solid var(--border); }
+  .form-group { margin-bottom: 1rem; }
+  .form-group label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; margin-bottom: 0.35rem; }
+  .field { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 0.55rem 0.75rem; background: var(--surface); font-size: 0.88rem; color: var(--text); font-family: var(--font-sans); }
+  .field.highlight { border-color: var(--assigned); box-shadow: 0 0 0 3px var(--assigned-tint); }
+  .suggest-row { display: flex; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap; }
+  .suggest-chip { font-size: 0.72rem; background: var(--assigned-tint); color: var(--assigned); padding: 0.2rem 0.55rem; border-radius: 999px; font-weight: 600; }
+
+  .right-col { flex: 1 1 420px; display: flex; flex-direction: column; gap: 1rem; }
+  .task-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 1rem 1.15rem; }
+  .task-top { display: flex; gap: 0.4rem; flex-wrap: wrap; align-items: center; margin-bottom: 0.4rem; }
+  .task-id { font-family: ui-monospace, monospace; font-size: 0.7rem; color: var(--text-subtle); background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; padding: 0.1rem 0.4rem; }
+  .badge { font-size: 0.78rem; font-weight: 600; padding: 0.1rem 0.5rem; border-radius: 4px; }
+  .badge-employee { color: var(--accent); background: var(--accent-tint); }
+  .badge-client { color: var(--assigned); background: var(--assigned-tint); }
+  .task-title { font-weight: 700; font-size: 0.95rem; }
+
+  .report-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 1.25rem; }
+  .report-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.9rem; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th { text-align: left; color: var(--text-muted); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.02em; padding: 0.5rem 0.6rem; border-bottom: 1px solid var(--border); }
+  td { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  .client-cell { font-weight: 700; display: flex; align-items: center; gap: 0.4rem; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--assigned); flex-shrink: 0; }
+</style>
+
+<div class="wrap">
+  <div class="modal-card">
+    <div class="modal-title">Assign New Daily Task</div>
+    <div class="form-group">
+      <label>Task title</label>
+      <input class="field" value="TDS Marquecom fy 2025-26" readonly />
+    </div>
+    <div class="form-group">
+      <label>Client (optional)</label>
+      <input class="field highlight" value="Marque" readonly />
+      <div class="suggest-row">
+        <span class="suggest-chip">Marque</span>
+        <span class="suggest-chip">Onestack MH</span>
+        <span class="suggest-chip">Esscube</span>
+        <span class="suggest-chip">+ type a new one</span>
+      </div>
+    </div>
+    <div class="form-group">
+      <label>Due time</label>
+      <input class="field" value="Sep 20, 2026, 5:00 PM" readonly />
+    </div>
+  </div>
+
+  <div class="right-col">
+    <div class="task-card">
+      <div class="task-top">
+        <span class="task-id">TASK-0002</span>
+        <span class="badge badge-employee">Kishan Sharma</span>
+        <span class="badge badge-client">Client: Marque</span>
+      </div>
+      <div class="task-title">TDS Marquecom fy 2025-26</div>
+    </div>
+
+    <div class="report-card">
+      <div class="report-title">EOM Report &mdash; Client breakdown (September 2026)</div>
+      <table>
+        <thead><tr><th>Client</th><th>Employee</th><th>Tasks</th><th>Avg progress</th></tr></thead>
+        <tbody>
+          <tr><td class="client-cell"><span class="dot"></span>Marque</td><td>Kishan Sharma</td><td>3</td><td>72%</td></tr>
+          <tr><td></td><td>Sunit</td><td>1</td><td>40%</td></tr>
+          <tr><td class="client-cell"><span class="dot"></span>Onestack MH</td><td>Wasim Khan</td><td>2</td><td>85%</td></tr>
+          <tr><td class="client-cell"><span class="dot" style="background:var(--text-subtle)"></span>No client tagged</td><td>Yug</td><td>4</td><td>60%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

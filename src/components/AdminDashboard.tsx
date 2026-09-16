@@ -229,6 +229,11 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                       {task.employeeName}
                     </span>
                     <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{task.date}</span>
+                    {task.client && (
+                      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--assigned)', background: 'var(--assigned-light)', padding: '0.1rem 0.5rem', borderRadius: '4px' }}>
+                        Client: {task.client}
+                      </span>
+                    )}
                   </div>
                   <div style={{ fontWeight: 700, marginTop: '0.25rem' }}>{task.task}</div>
                 </div>

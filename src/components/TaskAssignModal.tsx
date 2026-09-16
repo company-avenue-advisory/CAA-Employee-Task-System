@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Employee, TaskPriority } from '@/lib/types';
 import { defaultDueDateTime } from '@/lib/dateUtils';
+import { KNOWN_CLIENTS } from '@/lib/clients';
 import { X, PlusCircle } from 'lucide-react';
 
 interface TaskAssignModalProps {
@@ -13,6 +14,7 @@ interface TaskAssignModalProps {
     description: string;
     priority: TaskPriority;
     dueTime: string;
+    client: string;
   }) => Promise<void>;
 }
 
@@ -29,6 +31,7 @@ export const TaskAssignModal: React.FC<TaskAssignModalProps> = ({
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<TaskPriority>('Medium');
   const [dueTime, setDueTime] = useState(defaultDueDateTime());
+  const [client, setClient] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -54,11 +57,13 @@ export const TaskAssignModal: React.FC<TaskAssignModalProps> = ({
         description,
         priority,
         dueTime,
+        client,
       });
       // Reset form
       setTask('');
       setDescription('');
       setDueTime(defaultDueDateTime());
+      setClient('');
       onClose();
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to assign task');
@@ -126,6 +131,21 @@ export const TaskAssignModal: React.FC<TaskAssignModalProps> = ({
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+          </div>
+
+          <div className="form-group" style={{ marginBottom: '1rem' }}>
+            <label htmlFor="assign-client">Client (Optional)</label>
+            <select
+              id="assign-client"
+              className="select-input"
+              value={client}
+              onChange={(e) => setClient(e.target.value)}
+            >
+              <option value="">No client</option>
+              {KNOWN_CLIENTS.map((name) => (
+                <option key={name} value={name}>{name}</option>
+              ))}
+            </select>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1.25rem' }}>

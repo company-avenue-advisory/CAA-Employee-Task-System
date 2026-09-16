@@ -86,6 +86,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           <Clock size={14} />
           <span>Due: {formatDueTime(task.dueTime)}</span>
         </div>
+        {task.client && (
+          <div className="meta-item" style={{ color: 'var(--assigned)', fontWeight: 600 }}>
+            <span>Client: {task.client}</span>
+          </div>
+        )}
         {task.outputLink && (
           <div className="meta-item">
             <ExternalLink size={14} />
