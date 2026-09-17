@@ -414,6 +414,13 @@ a:hover {
   box-shadow: 0 0 0 2px var(--caa-blue-light);
 }
 
+.select-input:disabled, .text-input:disabled, .textarea-input:disabled {
+  background-color: var(--bg-page);
+  color: var(--text-muted);
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
 .textarea-input {
   resize: vertical;
   min-height: 70px;
@@ -431,6 +438,11 @@ a:hover {
   height: 6px;
   accent-color: var(--caa-blue);
   cursor: pointer;
+}
+
+.progress-slider:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }
 
 .progress-val {
