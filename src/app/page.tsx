@@ -285,6 +285,7 @@ export default function Home() {
             currentEmployee={currentEmployee}
             tasks={tasks}
             onUpdateTask={handleUpdateTask}
+            onDeleteTask={handleDeleteTask}
             onRefreshTasks={() => fetchTasksAndEmployees(currentEmployee)}
             onSubmitEOD={handleSubmitEOD}
           />

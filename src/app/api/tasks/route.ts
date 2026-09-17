@@ -69,12 +69,18 @@ export async function POST(request: NextRequest) {
     const employees = await provider.getEmployees();
     const currentRole = resolveCurrentRole(employees, session);
 
+    // Whether the target is the creator's own name — true self-add regardless of role, since
+    // every role (Employee through Owner) can self-add their own work via "My Tasks".
+    const isSelfAdd = !!employeeName && employeeName.trim().toLowerCase() === session.name.toLowerCase();
+
     if (currentRole === 'Manager' || currentRole === 'Owner') {
-      // Managers and Owner may assign tasks to any employee; source will be ASSIGNED server‑side.
+      // Managers and Owner may assign to any employee, or self-add their own work.
     } else if (currentRole === 'Senior Accountant') {
-      // Senior Accountant may only assign tasks to their delegated reports.
+      // Senior Accountant may assign to their delegated reports, or self-add their own work
+      // (they're still an employee for their own "My Tasks" tab, same as a plain Employee).
       const managed = resolveManagedNames(employees, session.email);
-      if (!employeeName || !managed.has(employeeName.trim().toLowerCase())) {
+      const targetName = employeeName ? employeeName.trim().toLowerCase() : '';
+      if (!isSelfAdd && !managed.has(targetName)) {
         return NextResponse.json(
           { success: false, error: 'Forbidden: You can only assign tasks to employees you manage' },
           { status: 403 }
@@ -120,9 +126,10 @@ export async function POST(request: NextRequest) {
       dueTime: dueTime.trim(),
       date,
       client: client ? client.trim() : '',
-      // Set source based on role: only a plain Employee self-adds; every other
-      // role that reaches this point has already passed an assignment-authority check above.
-      source: currentRole === 'Employee' ? TaskSource.SELF_ADDED : TaskSource.ASSIGNED,
+      // Source reflects who the work is actually for, not who created it: self-targeted work
+      // is self-initiated regardless of the creator's role; anything targeting someone else
+      // has already passed an assignment-authority check above.
+      source: isSelfAdd ? TaskSource.SELF_ADDED : TaskSource.ASSIGNED,
     };
 
     const newTask = await provider.createTask(input);

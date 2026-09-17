@@ -2,18 +2,23 @@ import React, { useState } from 'react';
 import { Task, TaskStatus } from '@/lib/types';
 import { StatusBadge, PriorityBadge } from './StatusBadge';
 import { formatDueTime } from '@/lib/dateUtils';
-import { Clock, ExternalLink, Save, CheckCircle, Lock } from 'lucide-react';
+import { Clock, ExternalLink, Save, CheckCircle, Lock, Edit2, Trash2 } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
   onUpdate: (taskId: string, updates: Partial<Task>) => Promise<void>;
   isReadOnly?: boolean;
+  // Shown only when provided — lets the owner of a self-added task edit or delete it.
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export const TaskCard: React.FC<TaskCardProps> = ({
   task,
   onUpdate,
   isReadOnly = false,
+  onEdit,
+  onDelete,
 }) => {
   const [status, setStatus] = useState<TaskStatus>(task.status);
   const [progress, setProgress] = useState<number>(task.progress);
@@ -76,6 +81,26 @@ export const TaskCard: React.FC<TaskCardProps> = ({
           <span className={`badge badge-${task.source === 'SELF_ADDED' ? 'self' : 'assigned'}`}>
             {task.source === 'SELF_ADDED' ? 'SELF-INITIATED' : 'ASSIGNED'}
           </span>
+          {onEdit && (
+            <button
+              type="button"
+              onClick={onEdit}
+              title="Edit Task"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: '0.2rem', display: 'flex' }}
+            >
+              <Edit2 size={15} />
+            </button>
+          )}
+          {onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              title="Delete Task"
+              style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--status-blocked-text)', padding: '0.2rem', display: 'flex' }}
+            >
+              <Trash2 size={15} />
+            </button>
+          )}
         </div>
       </div>
 

@@ -10,6 +10,7 @@ interface EmployeeDashboardProps {
   currentEmployee: Employee;
   tasks: Task[];
   onUpdateTask: (taskId: string, updates: Partial<Task>) => Promise<void>;
+  onDeleteTask: (taskId: string) => Promise<void>;
   onSubmitEOD: () => Promise<void>;
   // Callback to refresh tasks after self‑added work
   onRefreshTasks: () => Promise<void>;
@@ -134,6 +135,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
   currentEmployee,
   tasks,
   onUpdateTask,
+  onDeleteTask,
   onSubmitEOD,
   onRefreshTasks,
 }) => {
@@ -150,6 +152,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
 
   // null = viewing "Today"; a 'YYYY-MM-DD' string = browsing a past day's history (read-only)
   const [viewDate, setViewDate] = useState<string | null>(null);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [dismissedDueSoon, setDismissedDueSoon] = useState<Set<string>>(new Set());
   const [nowTick, setNowTick] = useState(Date.now());
 
@@ -172,10 +175,20 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
     (t) => t.employeeName.toLowerCase() === currentEmployee.name.toLowerCase()
   );
   const todayTasks = employeeTasks.filter((t) => t.date === todayStr);
+  // Any not-yet-completed work from before today carries forward into "Today" so it isn't lost
+  // once the day passes. EOD-submitted status doesn't matter here — that only reflects whether
+  // you reported it for that day, not whether the work is finished; a carried-over task that's
+  // still EOD-locked simply renders read-only until a manager reopens it (existing lock logic).
+  // The task keeps its real original date (shown as a label); History for that original day is
+  // unaffected, this only changes what's actionable today.
+  const carriedOverTasks = employeeTasks.filter(
+    (t) => t.date < todayStr && t.status !== 'Completed'
+  );
+  const activeTasks = [...todayTasks, ...carriedOverTasks];
   const historyTasks = isViewingHistory ? employeeTasks.filter((t) => t.date === viewDate) : [];
-  const visibleTasks = isViewingHistory ? historyTasks : todayTasks;
+  const visibleTasks = isViewingHistory ? historyTasks : activeTasks;
 
-  const dueSoonTasks = todayTasks.filter((t) => {
+  const dueSoonTasks = activeTasks.filter((t) => {
     if (isViewingHistory) return false;
     if (dismissedDueSoon.has(t.id)) return false;
     if (t.status === 'Completed' || t.eodSubmitted) return false;
@@ -194,6 +207,15 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
       setErrorMessage(err.message || 'Failed to submit EOD. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteOwnTask = async (taskId: string) => {
+    if (!confirm('Delete this task? This cannot be undone.')) return;
+    try {
+      await onDeleteTask(taskId);
+    } catch (err: any) {
+      setErrorMessage(err.message || 'Failed to delete task.');
     }
   };
 
@@ -224,7 +246,7 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
           }}
         >
           Today
-          <span>{todayTasks.length}</span>
+          <span>{activeTasks.length}</span>
         </button>
 
         <div>
@@ -347,14 +369,26 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
               )}
             </div>
           ) : (
-            visibleTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onUpdate={onUpdateTask}
-                isReadOnly={isViewingHistory}
-              />
-            ))
+            visibleTasks.map((task) => {
+              const isCarriedOver = !isViewingHistory && task.date !== todayStr;
+              const canManage = !isViewingHistory && !task.eodSubmitted && task.source === 'SELF_ADDED';
+              return (
+                <div key={task.id}>
+                  {isCarriedOver && (
+                    <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--status-in-progress-text)', marginBottom: '0.35rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                      <Clock size={12} /> Carried forward from {task.date} — still pending
+                    </div>
+                  )}
+                  <TaskCard
+                    task={task}
+                    onUpdate={onUpdateTask}
+                    isReadOnly={isViewingHistory}
+                    onEdit={canManage ? () => setEditingTask(task) : undefined}
+                    onDelete={canManage ? () => handleDeleteOwnTask(task.id) : undefined}
+                  />
+                </div>
+              );
+            })
           )}
 
           {/* Add Work Button — only relevant to today, not a past-day history view */}
@@ -444,12 +478,94 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
               </div>
             </div>
           )}
+
+          {/* Edit Self-Added Task Modal */}
+          {editingTask && (
+            <div className="modal-overlay" onClick={() => setEditingTask(null)}>
+              <div className="modal-content" role="dialog" aria-modal="true" aria-labelledby="editTaskTitle" onClick={e => e.stopPropagation()}>
+                <button className="modal-close-button" aria-label="Close" onClick={() => setEditingTask(null)}>&times;</button>
+                <h2 id="editTaskTitle">Edit Task: {editingTask.id}</h2>
+                <div className="form-group">
+                  <label>Task Title</label>
+                  <input
+                    className="text-input"
+                    value={editingTask.task}
+                    onChange={(e) => setEditingTask({ ...editingTask, task: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea
+                    className="textarea-input"
+                    value={editingTask.description || ''}
+                    onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Priority</label>
+                  <select
+                    className="select-input"
+                    value={editingTask.priority}
+                    onChange={(e) => setEditingTask({ ...editingTask, priority: e.target.value as TaskPriority })}
+                  >
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Due Time</label>
+                  <input
+                    type="datetime-local"
+                    className="text-input"
+                    value={editingTask.dueTime}
+                    onChange={(e) => setEditingTask({ ...editingTask, dueTime: e.target.value })}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Client (Optional)</label>
+                  <select
+                    className="select-input"
+                    value={editingTask.client || ''}
+                    onChange={(e) => setEditingTask({ ...editingTask, client: e.target.value })}
+                  >
+                    <option value="">No client</option>
+                    {KNOWN_CLIENTS.map((name) => (
+                      <option key={name} value={name}>{name}</option>
+                    ))}
+                  </select>
+                </div>
+                {errorMessage && <div style={{ color: 'var(--status-blocked-text)', marginTop: '0.5rem' }}>{errorMessage}</div>}
+                <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    className="btn btn-primary"
+                    onClick={async () => {
+                      await onUpdateTask(editingTask.id, {
+                        task: editingTask.task,
+                        description: editingTask.description,
+                        priority: editingTask.priority,
+                        dueTime: editingTask.dueTime,
+                        client: editingTask.client || '',
+                      });
+                      setEditingTask(null);
+                    }}
+                  >
+                    Save Changes
+                  </button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setEditingTask(null)}>
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* EOD Footer — today's tasks only */}
-        {!isViewingHistory && todayTasks.length > 0 && (
+        {/* EOD Footer — today's tasks plus anything carried forward from a pending prior day */}
+        {!isViewingHistory && activeTasks.length > 0 && (
           <EODSubmitFooter
-            tasks={todayTasks}
+            tasks={activeTasks}
             onSubmitEOD={handleSubmitEOD}
             isSubmitting={isSubmitting}
             submitSuccess={submitSuccess}

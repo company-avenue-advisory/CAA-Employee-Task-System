@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getDataProvider } from '@/lib/repositories/dataProvider';
-import { TaskStatus, TaskPriority } from '@/lib/types';
+import { TaskStatus, TaskPriority, TaskSource } from '@/lib/types';
 import { getAuthenticatedUser, hasManagerAccess, resolveManagedNames, resolveCurrentRole } from '@/lib/auth';
 
 const VALID_STATUSES: TaskStatus[] = ['Not Started', 'In Progress', 'Blocked', 'Completed'];
@@ -86,6 +86,19 @@ export async function PUT(
           { status: 400 }
         );
       }
+
+      // Rule 3: An Employee may only edit the core fields (title/priority/due time/client) on
+      // work they added themselves — never override what a manager assigned them. Status,
+      // progress, EOD note, and output link remain editable either way (unchanged behavior).
+      const editsCoreFields = ['task', 'description', 'priority', 'dueTime', 'client'].some(
+        (field) => field in updateData
+      );
+      if (editsCoreFields && existingTask.source !== TaskSource.SELF_ADDED) {
+        return NextResponse.json(
+          { success: false, error: 'Forbidden: You can only edit the details of work you added yourself' },
+          { status: 403 }
+        );
+      }
     } else if (currentRole === 'Senior Accountant') {
       const isSelf = existingTask.employeeName.toLowerCase() === session.name.toLowerCase();
       if (!isSelf) {
@@ -137,20 +150,35 @@ export async function DELETE(
     const currentRole = resolveCurrentRole(employees, session);
 
     // Authorization rule: Managers/Owner can delete any task; Senior Accountant only
-    // tasks belonging to the employees they manage.
+    // tasks belonging to the employees they manage; a plain Employee only their own
+    // self-added tasks (never something a manager assigned to them).
     if (!hasManagerAccess(currentRole)) {
-      if (currentRole !== 'Senior Accountant') {
+      if (currentRole === 'Senior Accountant') {
+        const tasks = await provider.getTasks();
+        const target = tasks.find((t) => t.id === id);
+        const managed = resolveManagedNames(employees, session.email);
+        if (!target || !managed.has(target.employeeName.toLowerCase())) {
+          return NextResponse.json(
+            { success: false, error: 'Forbidden: You can only delete tasks for employees you manage' },
+            { status: 403 }
+          );
+        }
+      } else if (currentRole === 'Employee') {
+        const tasks = await provider.getTasks();
+        const target = tasks.find((t) => t.id === id);
+        const isOwnSelfAdded =
+          !!target &&
+          target.employeeName.toLowerCase() === session.name.toLowerCase() &&
+          target.source === TaskSource.SELF_ADDED;
+        if (!isOwnSelfAdded) {
+          return NextResponse.json(
+            { success: false, error: 'Forbidden: You can only delete work you added yourself' },
+            { status: 403 }
+          );
+        }
+      } else {
         return NextResponse.json(
           { success: false, error: 'Forbidden: Only Managers can delete tasks' },
-          { status: 403 }
-        );
-      }
-      const tasks = await provider.getTasks();
-      const target = tasks.find((t) => t.id === id);
-      const managed = resolveManagedNames(employees, session.email);
-      if (!target || !managed.has(target.employeeName.toLowerCase())) {
-        return NextResponse.json(
-          { success: false, error: 'Forbidden: You can only delete tasks for employees you manage' },
           { status: 403 }
         );
       }
