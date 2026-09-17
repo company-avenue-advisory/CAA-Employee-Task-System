@@ -1,6 +1,13 @@
 // Shared helpers for the Due Time field, which now stores a native
 // datetime-local value ('YYYY-MM-DDTHH:mm') instead of free text.
 
+// Matches the convention already used when tasks are created (date column
+// in the sheet) — used both client-side (dashboard) and server-side (EOD
+// lock check) so "today" means the same thing on both ends.
+export function getTodayStr(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
 export function defaultDueDateTime(): string {
   const d = new Date();
   d.setHours(17, 0, 0, 0); // default to 5:00 PM today

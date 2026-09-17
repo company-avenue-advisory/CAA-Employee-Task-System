@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Employee, Task, TaskPriority } from '@/lib/types';
 import { TaskCard } from './TaskCard';
 import { EODSubmitFooter } from './EODSubmitFooter';
-import { defaultDueDateTime, formatDueTime } from '@/lib/dateUtils';
+import { defaultDueDateTime, formatDueTime, getTodayStr } from '@/lib/dateUtils';
 import { KNOWN_CLIENTS } from '@/lib/clients';
 import { Calendar, CheckCircle2, ListTodo, Clock, X } from 'lucide-react';
 
@@ -14,12 +14,6 @@ interface EmployeeDashboardProps {
   onSubmitEOD: () => Promise<void>;
   // Callback to refresh tasks after self‑added work
   onRefreshTasks: () => Promise<void>;
-}
-
-function getTodayStr(): string {
-  // Matches the convention already used when tasks are created (see
-  // googleSheetsRepository.createTask / the self‑add form below).
-  return new Date().toISOString().split('T')[0];
 }
 
 function buildCalendarGrid(year: number, month: number): { dateStr: string; day: number; inMonth: boolean }[] {
@@ -176,14 +170,13 @@ export const EmployeeDashboard: React.FC<EmployeeDashboardProps> = ({
   );
   const todayTasks = employeeTasks.filter((t) => t.date === todayStr);
   // Any not-yet-completed work from before today carries forward into "Today" so it isn't lost
-  // once the day passes. EOD-submitted status doesn't matter here — that only reflects whether
-  // you reported it for that day, not whether the work is finished; a carried-over task that's
-  // still EOD-locked simply renders read-only until a manager reopens it (existing lock logic).
-  // The task keeps its real original date (shown as a label); History for that original day is
-  // unaffected, this only changes what's actionable today.
-  const carriedOverTasks = employeeTasks.filter(
-    (t) => t.date < todayStr && t.status !== 'Completed'
-  );
+  // once the day passes. Its eodSubmitted flag is stale (it only reflects whether you reported
+  // it on its ORIGINAL day) — clear it here so the card is actionable again today instead of
+  // staying frozen forever. The task keeps its real original date (shown as a label); History
+  // for that original day is unaffected, this only changes what's actionable today.
+  const carriedOverTasks = employeeTasks
+    .filter((t) => t.date < todayStr && t.status !== 'Completed')
+    .map((t) => ({ ...t, eodSubmitted: false }));
   const activeTasks = [...todayTasks, ...carriedOverTasks];
   const historyTasks = isViewingHistory ? employeeTasks.filter((t) => t.date === viewDate) : [];
   const visibleTasks = isViewingHistory ? historyTasks : activeTasks;

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getDataProvider } from '@/lib/repositories/dataProvider';
 import { TaskStatus, TaskPriority, TaskSource } from '@/lib/types';
 import { getAuthenticatedUser, hasManagerAccess, resolveManagedNames, resolveCurrentRole } from '@/lib/auth';
+import { getTodayStr } from '@/lib/dateUtils';
 
 const VALID_STATUSES: TaskStatus[] = ['Not Started', 'In Progress', 'Blocked', 'Completed'];
 const VALID_PRIORITIES: TaskPriority[] = ['High', 'Medium', 'Low'];
@@ -66,6 +67,11 @@ export async function PUT(
       );
     }
 
+    // A task's EOD lock only means "already reported for its own date" — once
+    // it carries forward into a new day (still incomplete), that flag is stale
+    // and shouldn't keep blocking updates forever.
+    const isEodLocked = existingTask.eodSubmitted && existingTask.date === getTodayStr();
+
     // SERVER-SIDE AUTHORIZATION & EOD LOCK RULES:
     if (currentRole === 'Employee') {
       // Rule 1: Employee can only update their own task
@@ -77,7 +83,8 @@ export async function PUT(
       }
 
       // Rule 2: SERVER-SIDE EOD LOCK. Employee cannot update task if EOD is already submitted
-      if (existingTask.eodSubmitted) {
+      // for its own date (a carried-forward task from a prior day is exempt).
+      if (isEodLocked) {
         return NextResponse.json(
           {
             success: false,
@@ -109,7 +116,7 @@ export async function PUT(
             { status: 403 }
           );
         }
-      } else if (existingTask.eodSubmitted) {
+      } else if (isEodLocked) {
         // Same EOD lock applies to their own tasks as any employee.
         return NextResponse.json(
           {
